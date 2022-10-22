@@ -12,16 +12,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureObservability
 class AzureExporterApplicationTests {
 
-	@Autowired
-	private PrometheusScrapeEndpointWebExtension promScrapeExtension;
+    @Autowired
+    private PrometheusScrapeEndpointWebExtension promScrapeExtension;
 
-	@Autowired
-	private PrometheusScrapeEndpoint promScrapeDelegate;
+    @Autowired
+    private PrometheusScrapeEndpoint promScrapeDelegate;
 
-	@Test
-	void contextLoads() {
-		assertThat(promScrapeDelegate).isNotNull();
-		assertThat(promScrapeExtension).isNotNull();
-	}
+    @Test
+    void contextLoads() {
+        assertThat(promScrapeDelegate).isNotNull();
+        assertThat(promScrapeExtension).isNotNull();
+    }
 
 }

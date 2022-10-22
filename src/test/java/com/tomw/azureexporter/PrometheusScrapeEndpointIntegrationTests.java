@@ -18,19 +18,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureObservability
 public class PrometheusScrapeEndpointIntegrationTests {
 
-  private static final String ACTUATOR_PROMETHEUS_ENDPOINT = "/actuator/prometheus";
-  @Autowired
-  private MockMvc mockMvc;
+    private static final String ACTUATOR_PROMETHEUS_ENDPOINT = "/actuator/prometheus";
+    @Autowired
+    private MockMvc mockMvc;
 
-  @Test
-  public void testScrapeEndpoint_noParameters_ok() throws Exception {
-    mockMvc.perform(get(ACTUATOR_PROMETHEUS_ENDPOINT)).andExpect(status().isOk());
-  }
+    @Test
+    public void testScrapeEndpoint_noParameters_ok() throws Exception {
+        mockMvc.perform(get(ACTUATOR_PROMETHEUS_ENDPOINT)).andExpect(status().isOk());
+    }
 
-  @Test
-  public void testScrapeEndpoint_noParameters_metricsReturned() throws Exception {
-    MvcResult result = mockMvc.perform(get(ACTUATOR_PROMETHEUS_ENDPOINT)).andReturn();
-    assertTrue(result.getResponse().getContentAsString().contains("cpu_usage"));
-  }
+    @Test
+    public void testScrapeEndpoint_noParameters_metricsReturned() throws Exception {
+        MvcResult result = mockMvc.perform(get(ACTUATOR_PROMETHEUS_ENDPOINT)).andReturn();
+        assertTrue(result.getResponse().getContentAsString().contains("cpu_usage"));
+    }
 
 }

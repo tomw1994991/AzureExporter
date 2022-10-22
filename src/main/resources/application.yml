@@ -5,3 +5,6 @@ management:
         include:
           - health
           - prometheus
+
+resource-discovery:
+  interval-in-millis: 300000
