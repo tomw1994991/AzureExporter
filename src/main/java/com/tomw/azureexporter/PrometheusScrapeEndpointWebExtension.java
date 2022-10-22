@@ -19,8 +19,8 @@ import java.util.Set;
 @AllArgsConstructor
 public class PrometheusScrapeEndpointWebExtension {
 
-    private PrometheusScrapeEndpoint delegate;
-    private MeterRegistry registry;
+    private final PrometheusScrapeEndpoint delegate;
+    private final MeterRegistry registry;
 
     @ReadOperation
     public WebEndpointResponse<String> scrape(TextOutputFormat format, @Nullable Set<String> includedNames) {

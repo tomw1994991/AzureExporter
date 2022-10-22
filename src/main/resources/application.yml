@@ -8,3 +8,15 @@ management:
 
 resource-discovery:
   interval-in-millis: 300000
+
+scrape:
+  interval-in-millis: 300000
+  granularity-in-mins: 5
+  metrics:
+    - resourceType: "Microsoft.Storage/storageAccounts"
+      metricNames:
+        - "Availability"
+        - "Ingress"
+    - resourceType: "Microsoft.Compute/VirtualMachines"
+      metricNames:
+        - "CPU"

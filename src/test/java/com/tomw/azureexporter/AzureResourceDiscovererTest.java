@@ -51,7 +51,7 @@ public class AzureResourceDiscovererTest {
     }
 
     @Test
-    public void testGetResourcesForType_multipleResources_returned() {
+    public void testGetResourcesForType_multipleResources_returned_caseIgnored() {
 
         Map<String, Object> resource = setupResourceMap("id1", "storage", new HashMap<>());
         Map<String, Object> resource2 = setupResourceMap("id2", "storage", new HashMap<>());
@@ -59,7 +59,7 @@ public class AzureResourceDiscovererTest {
 
         setupQueryResponseFromResourceMaps(Arrays.asList(resource, resource2, resource3));
         resourceDiscoverer.discoverResources();
-        Set<AzureResource> resources = resourceDiscoverer.getResourcesForType("storage");
+        Set<AzureResource> resources = resourceDiscoverer.getResourcesForType("STORage");
         assertEquals(resources.size(), 2);
     }
 

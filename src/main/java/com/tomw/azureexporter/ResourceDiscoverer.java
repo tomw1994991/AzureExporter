@@ -31,7 +31,7 @@ public class ResourceDiscoverer {
         resourceManager = ResourceGraphManager.authenticate(new DefaultAzureCredentialBuilder().build(), profile);
     }
 
-    @Scheduled(initialDelay = 2000L, fixedDelayString = "${resource-discovery.interval-in-millis:300000}")
+    @Scheduled(initialDelay = 1000L, fixedDelayString = "${resource-discovery.interval-in-millis:300000}")
     protected void discoverResources() {
         QueryRequest query = new QueryRequest().withQuery("Resources").withOptions(new QueryRequestOptions().withResultFormat(ResultFormat.OBJECT_ARRAY));
         QueryResponse response = resourceManager.resourceProviders().resources(query);
@@ -48,16 +48,21 @@ public class ResourceDiscoverer {
     }
 
     /*package*/ AzureResource convertMapToResource(final Map<String, Object> responseMap){
-        return new AzureResource((String) responseMap.get("id"), (String) responseMap.get("type"), (Map) responseMap.getOrDefault("tags", new HashMap<>()));
+        return new AzureResource((String) responseMap.get("id"), (String) responseMap.get("type"), (Map<String, String>) responseMap.getOrDefault("tags", new HashMap<>()));
     }
 
     private void saveResource(AzureResource resource) {
-        resources.putIfAbsent(resource.getType(), new HashSet<>());
-        resources.get(resource.getType()).add(resource);
+        String lowerCaseType = resource.getType().toLowerCase();
+        resources.putIfAbsent(lowerCaseType, new HashSet<>());
+        resources.get(lowerCaseType).add(resource);
     }
 
     public Set<AzureResource> getResourcesForType(final String type) {
-        return null == type ? new HashSet<>() : resources.getOrDefault(type, new HashSet<>());
+        return null == type ? new HashSet<>() : resources.getOrDefault(type.toLowerCase(), new HashSet<>());
+    }
+
+    public Set<String> getDiscoveredResourceTypes(){
+        return resources.keySet();
     }
 
 }
