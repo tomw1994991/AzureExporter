@@ -19,5 +19,17 @@ public class MetricRegistryTest {
         assertEquals(expectedPrometheusName, MetricRegistry.createPrometheusMetricName(azMetricName, azResourceType));
     }
 
-
+    @ParameterizedTest
+    @CsvSource({
+            "Microsoft.Storage/storageAccounts, storageAccounts",
+            "a, a",
+            ",",
+            "123_12345/123123, 123123",
+            "a/b/c/d, d",
+            "a/, a/",
+            "virtualMachines, virtualMachines",
+    })
+    public void testSubstringAfterSlash_variousValues( String input, String expectedSubstring){
+        assertEquals(expectedSubstring, MetricRegistry.substringAfterSlash(input));
+    }
 }

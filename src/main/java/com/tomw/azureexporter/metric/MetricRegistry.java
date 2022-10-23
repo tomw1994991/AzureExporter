@@ -2,6 +2,7 @@ package com.tomw.azureexporter.metric;
 
 import com.azure.monitor.query.models.MetricResult;
 import com.tomw.azureexporter.resource.AzureResource;
+import io.micrometer.common.util.StringUtils;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
@@ -28,9 +29,13 @@ public class MetricRegistry {
 
 
     public static final String substringAfterSlash(String original){
-        int lastSlash = original.lastIndexOf("/");
-        String afterSlash = (lastSlash > 0 && lastSlash + 1 < original.length())? original.substring(lastSlash + 1) : original;
-        return afterSlash;
+        if(StringUtils.isEmpty(original)){
+            return original;
+        } else {
+            int lastSlash = original.lastIndexOf("/");
+            String afterSlash = (lastSlash > 0 && lastSlash + 1 < original.length()) ? original.substring(lastSlash + 1) : original;
+            return afterSlash;
+        }
     }
 
     private static String convertAzureMetricNameForPrometheus(final String metricName){
