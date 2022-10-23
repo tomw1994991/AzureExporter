@@ -8,9 +8,11 @@ management:
 
 resource-discovery:
   interval-in-millis: 300000
+  initial-delay-millis: 500
 
 scrape:
-  interval-in-millis: 300000
+  interval-in-millis: 60000
+  initial-delay-millis: 5000
   granularity-in-mins: 5
   resourceTypeConfigs:
     - resourceType: "Microsoft.Storage/storageAccounts"

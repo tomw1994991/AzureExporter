@@ -31,7 +31,7 @@ public class ResourceDiscoverer {
         resourceManager = ResourceGraphManager.authenticate(new DefaultAzureCredentialBuilder().build(), profile);
     }
 
-    @Scheduled(initialDelay = 1000L, fixedDelayString = "${resource-discovery.interval-in-millis:300000}")
+    @Scheduled(initialDelayString = "${resource-discovery.initial-delay-millis:1000}", fixedDelayString = "${resource-discovery.interval-in-millis:300000}")
     protected void discoverResources() {
         QueryRequest query = new QueryRequest().withQuery("Resources").withOptions(new QueryRequestOptions().withResultFormat(ResultFormat.OBJECT_ARRAY));
         QueryResponse response = resourceManager.resourceProviders().resources(query);
