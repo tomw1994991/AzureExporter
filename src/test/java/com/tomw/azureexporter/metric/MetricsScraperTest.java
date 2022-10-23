@@ -8,12 +8,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.OffsetDateTime;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -54,6 +54,6 @@ public class MetricsScraperTest {
     @ValueSource( ints = {0,1,3000,100000000})
     public void testQueryWithTimeInterval_noErrors(int timeInterval){
         MetricsQueryOptions queryWithTimeInterval = metricsScraper.setMetricsQueryInterval(new MetricsQueryOptions(), timeInterval);
-        assertTrue(queryWithTimeInterval.getTimeInterval().getStartTime().isBefore(OffsetDateTime.now()));
+        assertEquals( Duration.ofMillis(timeInterval), queryWithTimeInterval.getTimeInterval().getDuration());
     }
 }
