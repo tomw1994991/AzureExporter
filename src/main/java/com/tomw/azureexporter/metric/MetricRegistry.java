@@ -3,7 +3,7 @@ package com.tomw.azureexporter.metric;
 import com.azure.monitor.query.models.MetricResult;
 import com.tomw.azureexporter.resource.AzureResource;
 import io.micrometer.common.util.StringUtils;
-import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,10 +21,18 @@ public class MetricRegistry {
 
 
     public void registerMetric(MetricResult metric, AzureResource resource) {
+        String promMetric = createPrometheusMetricName(metric.getMetricName(), resource.getType());
         metric.getTimeSeries().forEach(dataPoint -> {
-            Counter.builder(createPrometheusMetricName(metric.getMetricName(), resource.getType())).tag("id", substringAfterSlash(resource.getId())).description(metric.getDescription()).baseUnit(metric.getUnit().toString().toLowerCase(Locale.ROOT)).register(prometheusRegistry);
+            //TODO - count vs gauge?
+            //TODO - new?
+            //TODO - values not get 0
+            Gauge gauge = Gauge.builder(promMetric, () -> dataPoint.getValues().get(0).getTotal())
+                    .tag("id", substringAfterSlash(resource.getId()))
+                    .description(metric.getDescription())
+                    .baseUnit(metric.getUnit().toString().toLowerCase(Locale.ROOT))
+                    .register(prometheusRegistry);
         });
-        log.debug("Registered metric: {}", metric);
+        log.debug("Registered metric: {}", promMetric);
     }
 
 

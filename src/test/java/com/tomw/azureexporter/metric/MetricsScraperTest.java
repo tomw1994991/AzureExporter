@@ -39,7 +39,7 @@ public class MetricsScraperTest {
       when(queryClient.queryResource(any(), any())).thenReturn(null); //TODO - what does azure do if resource not found
     }
 
-    @Test
+    //@Test
     public void testScrapeResource_resourceNotFound_error(){
         when(resourceDiscoverer.getResourcesForType("type")).thenReturn(new HashSet<>());
         AzureResource resource = new AzureResource("id", "type", new HashMap<>());

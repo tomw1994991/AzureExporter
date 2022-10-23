@@ -22,3 +22,6 @@ scrape:
     - resourceType: "Microsoft.Compute/VirtualMachines"
       metricNames:
         - "CPU"
+    - resourceType: "Microsoft.Network/virtualNetworks"
+      metricNames:
+        - "Under DDos attack or not"
