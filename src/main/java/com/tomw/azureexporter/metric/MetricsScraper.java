@@ -53,7 +53,6 @@ public class MetricsScraper {
 
     @Scheduled(initialDelayString = "${scrape.initial-delay-millis:5000}", fixedDelayString = "${scrape.interval-in-millis:300000}")
     public void scrapeAllResources() {
-        //TODO - warnings about unsafe method in discoverer
         //TODO - play around with interval, granularity and window via api - should null value be stored
         //TODO - finish tests
         log.info("Beginning scrape of Azure resources for metrics.");

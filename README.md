@@ -14,3 +14,9 @@
 ### Example Metrics
 
 Microsoft.Storage/storageAccounts  Availability (unit = Bytes) -> azure_storageaccounts_availability_bytes
+
+### Docker
+
+- Using jib to produce docker image: https://github.com/GoogleContainerTools/jib/tree/master/jib-gradle-plugin 
+- For a local image: ./gradlew jibDockerBuild
+- To build to ACR: gradle jib -Djib.to.image='my_acr_name.azurecr.io/my-app'
