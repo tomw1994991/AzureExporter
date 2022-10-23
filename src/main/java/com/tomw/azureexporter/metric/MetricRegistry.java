@@ -1,6 +1,7 @@
 package com.tomw.azureexporter.metric;
 
 import com.azure.monitor.query.models.MetricResult;
+import com.azure.monitor.query.models.MetricValue;
 import com.tomw.azureexporter.resource.AzureResource;
 import io.micrometer.common.util.StringUtils;
 import io.micrometer.core.instrument.Gauge;
@@ -23,16 +24,29 @@ public class MetricRegistry {
     public void registerMetric(MetricResult metric, AzureResource resource) {
         String promMetric = createPrometheusMetricName(metric.getMetricName(), resource.getType());
         metric.getTimeSeries().forEach(dataPoint -> {
-            //TODO - count vs gauge?
-            //TODO - new?
-            //TODO - values not get 0
-            Gauge gauge = Gauge.builder(promMetric, () -> dataPoint.getValues().get(0).getTotal())
+            //TODO - better way of getting value from azure metric & should it be a new gauge each time (what about dimensions?)
+            Gauge gauge = Gauge.builder(promMetric, () -> getValueFromAzMetricValues(dataPoint.getValues().get(0)))
                     .tag("id", substringAfterSlash(resource.getId()))
                     .description(metric.getDescription())
                     .baseUnit(metric.getUnit().toString().toLowerCase(Locale.ROOT))
                     .register(prometheusRegistry);
         });
         log.debug("Registered metric: {}", promMetric);
+    }
+
+    //TODO
+    private static Double getValueFromAzMetricValues(MetricValue azValues){
+        Double value = azValues.getAverage();
+        if(null == value){
+            value = azValues.getTotal();
+        }
+        if(null == value){
+            value = azValues.getMinimum();
+        }
+        if(null == value){
+            value = azValues.getMaximum();
+        }
+        return value;
     }
 
 

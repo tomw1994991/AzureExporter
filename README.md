@@ -13,10 +13,16 @@
 
 ### Example Metrics
 
-Microsoft.Storage/storageAccounts  Availability (unit = Bytes) -> azure_storageaccounts_availability_bytes
+
+
+| metricName in application.yml                      | exposed metric                            |
+|----------------------------------------------------|-------------------------------------------|
+| Microsoft.Storage/storageAccounts  Availability    | azure_storageaccounts_availability_bytes  |
+| microsoft.category/resourceType    metricName      | azure_resourcetype_metricname_units       |
+| microsoft.category/CASEINSENSITIVE   special-chars | azure_caseinsensitive_special_chars_units |
 
 ### Docker
 
 - Using jib to produce docker image: https://github.com/GoogleContainerTools/jib/tree/master/jib-gradle-plugin 
 - For a local image: ./gradlew jibDockerBuild
-- To build to ACR: gradle jib -Djib.to.image='my_acr_name.azurecr.io/my-app'
+- To build to ACR: ./gradlew jib -Djib.to.image='my_acr_name.azurecr.io/my-app'

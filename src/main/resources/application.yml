@@ -16,12 +16,12 @@ scrape:
   granularity-in-mins: 5
   resourceTypeConfigs:
     - resourceType: "Microsoft.Storage/storageAccounts"
-      metricNames:
+      metrics:
         - "Availability"
         - "Ingress"
     - resourceType: "Microsoft.Compute/VirtualMachines"
-      metricNames:
+      metrics:
         - "CPU"
     - resourceType: "Microsoft.Network/virtualNetworks"
-      metricNames:
+      metrics:
         - "Under DDos attack or not"

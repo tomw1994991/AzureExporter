@@ -68,7 +68,7 @@ public class MetricsScraper {
         log.debug("[{}] Scraping metrics for resource type: {})", currentThread().getName(), resourceType.getResourceType());
         Set<AzureResource> resources = resourceDiscoverer.getResourcesForType(resourceType.getResourceType());
         resources.forEach(resource -> {
-            scrapeResource(resource, resourceType.getMetricNames());
+            scrapeResource(resource, resourceType.getMetrics());
         });
         log.debug("[{}] Finished scraping metrics for resource type: {})", currentThread().getName(), resourceType.getResourceType());
     }

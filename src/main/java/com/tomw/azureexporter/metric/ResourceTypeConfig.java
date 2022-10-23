@@ -8,5 +8,5 @@ import java.util.List;
 public class ResourceTypeConfig {
 
     private String resourceType;
-    private List<String> metricNames;
+    private List<String> metrics;
 }
