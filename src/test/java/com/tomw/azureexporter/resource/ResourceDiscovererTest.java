@@ -94,6 +94,13 @@ public class ResourceDiscovererTest {
     }
 
     @Test
+    public void testConvertMapToResource_nullTags(){
+        Map<String, Object> resourceMap = setupResourceMap("id1", "type1", null);
+        AzureResource resource = resourceDiscoverer.convertMapToResource(resourceMap);
+        assertEquals(0, resource.getTags().size());
+    }
+
+    @Test
     public void testConvertMapToResource_withTags(){
         Map<String, String> tags = new HashMap<>();
         tags.put("key1", "value1");

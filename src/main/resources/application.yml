@@ -19,6 +19,7 @@ scrape:
       metrics:
         - "Availability"
         - "Ingress"
+        - "Used capacity"
     - resourceType: "Microsoft.Compute/VirtualMachines"
       metrics:
         - "CPU"

@@ -2,6 +2,7 @@ package com.tomw.azureexporter.metric;
 
 import com.azure.monitor.query.models.MetricResult;
 import com.azure.monitor.query.models.MetricValue;
+import com.azure.monitor.query.models.TimeSeriesElement;
 import com.tomw.azureexporter.resource.AzureResource;
 import io.micrometer.common.util.StringUtils;
 import io.micrometer.core.instrument.Gauge;
@@ -24,34 +25,37 @@ public class MetricRegistry {
     public void registerMetric(MetricResult metric, AzureResource resource) {
         String promMetric = createPrometheusMetricName(metric.getMetricName(), resource.getType());
         metric.getTimeSeries().forEach(dataPoint -> {
-            //TODO - better way of getting value from azure metric & should it be a new gauge each time (what about dimensions?)
-            Gauge gauge = Gauge.builder(promMetric, () -> getValueFromAzMetricValues(dataPoint.getValues().get(0)))
-                    .tag("id", substringAfterSlash(resource.getId()))
-                    .description(metric.getDescription())
-                    .baseUnit(metric.getUnit().toString().toLowerCase(Locale.ROOT))
-                    .register(prometheusRegistry);
+            registerDataPoint(metric, resource, promMetric, dataPoint);
         });
-        log.debug("Registered metric: {}", promMetric);
+    }
+
+    //TODO - better way of getting value from azure metric & should it be a new gauge each time (what about dimensions?)
+    private void registerDataPoint(MetricResult metric, AzureResource resource, String promMetric, TimeSeriesElement dataPoint) {
+        Double value = getValueFromAzMetricValues(dataPoint.getValues().get(0));
+        if (value != null) {
+            Gauge gauge = Gauge.builder(promMetric, () -> value).tag("id", substringAfterSlash(resource.getId()))
+                .description(metric.getDescription()).baseUnit(metric.getUnit().toString().toLowerCase(Locale.ROOT)).register(prometheusRegistry);
+        }
     }
 
     //TODO
-    private static Double getValueFromAzMetricValues(MetricValue azValues){
+    private static Double getValueFromAzMetricValues(MetricValue azValues) {
         Double value = azValues.getAverage();
-        if(null == value){
+        if (null == value) {
             value = azValues.getTotal();
         }
-        if(null == value){
+        if (null == value) {
             value = azValues.getMinimum();
         }
-        if(null == value){
+        if (null == value) {
             value = azValues.getMaximum();
         }
         return value;
     }
 
 
-    public static final String substringAfterSlash(String original){
-        if(StringUtils.isEmpty(original)){
+    public static final String substringAfterSlash(String original) {
+        if (StringUtils.isEmpty(original)) {
             return original;
         } else {
             int lastSlash = original.lastIndexOf("/");
@@ -60,7 +64,7 @@ public class MetricRegistry {
         }
     }
 
-    private static String convertAzureMetricNameForPrometheus(final String metricName){
+    private static String convertAzureMetricNameForPrometheus(final String metricName) {
         return metricName.replaceAll("[^A-Za-z\\d]", "_").toLowerCase(Locale.ROOT);
     }
 

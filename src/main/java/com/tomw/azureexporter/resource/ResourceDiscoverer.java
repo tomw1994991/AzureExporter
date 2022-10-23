@@ -50,7 +50,8 @@ public class ResourceDiscoverer {
     }
 
     /*package*/ AzureResource convertMapToResource(final Map<String, Object> responseMap){
-        return new AzureResource((String) responseMap.get("id"), (String) responseMap.get("type"), (Map<String, String>) responseMap.getOrDefault("tags", new HashMap<>()));
+        Map<String, String> tags = (Map<String, String>) responseMap.getOrDefault("tags", new HashMap<>());
+        return new AzureResource((String) responseMap.get("id"), (String) responseMap.get("type"), null != tags ? tags : new HashMap<>());
     }
 
     private void saveResource(AzureResource resource, Map<String, Set<AzureResource>> resourceMap) {
