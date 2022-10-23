@@ -1,6 +1,5 @@
 package com.tomw.azureexporter;
 
-import io.micrometer.core.instrument.MeterRegistry;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
@@ -20,12 +19,10 @@ import java.util.Set;
 public class PrometheusScrapeEndpointWebExtension {
 
     private final PrometheusScrapeEndpoint delegate;
-    private final MeterRegistry registry;
 
     @ReadOperation
     public WebEndpointResponse<String> scrape(TextOutputFormat format, @Nullable Set<String> includedNames) {
         log.info("Prometheus scrape endpoint hit.");
-        //Counter myCounter = Counter.builder("custom.metric.name").tag("key1", "val1").description("custom_metric_desc").register(registry);
         return this.delegate.scrape(format, includedNames);
     }
 }

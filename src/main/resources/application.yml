@@ -12,7 +12,7 @@ resource-discovery:
 scrape:
   interval-in-millis: 300000
   granularity-in-mins: 5
-  metrics:
+  resourceTypeConfigs:
     - resourceType: "Microsoft.Storage/storageAccounts"
       metricNames:
         - "Availability"

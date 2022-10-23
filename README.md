@@ -13,4 +13,4 @@
 
 ### Example Metrics
 
-Microsoft.Storage/storageAccounts  Availability -> azure_storageaccounts_availability
+Microsoft.Storage/storageAccounts  Availability (unit = Bytes) -> azure_storageaccounts_availability_bytes

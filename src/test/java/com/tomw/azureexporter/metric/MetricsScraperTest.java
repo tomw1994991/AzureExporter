@@ -3,10 +3,8 @@ package com.tomw.azureexporter.metric;
 import com.azure.monitor.query.models.MetricsQueryOptions;
 import com.tomw.azureexporter.resource.AzureResource;
 import com.tomw.azureexporter.resource.ResourceDiscoverer;
-import io.micrometer.core.instrument.MeterRegistry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,7 +13,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -27,9 +24,9 @@ public class MetricsScraperTest {
     ResourceDiscoverer resourceDiscoverer = mock(ResourceDiscoverer.class);
 
     @Autowired
-    MeterRegistry meterRegistry;
+    MetricRegistry metricRegistry;
 
-    MetricsScraper metricsScraper = new MetricsScraper(config, resourceDiscoverer, meterRegistry);
+    MetricsScraper metricsScraper = new MetricsScraper(config, resourceDiscoverer, metricRegistry);
 
     @Test
     public void testScrapeResource_resourceNotFound_error(){
@@ -58,15 +55,5 @@ public class MetricsScraperTest {
     public void testQueryWithTimeInterval_noErrors(int timeInterval){
         MetricsQueryOptions queryWithTimeInterval = metricsScraper.setMetricsQueryInterval(new MetricsQueryOptions(), timeInterval);
         assertTrue(queryWithTimeInterval.getTimeInterval().getStartTime().isBefore(OffsetDateTime.now()));
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-            "Microsoft.Storage/storageAccounts, Availability, azure_storageaccounts_availability",
-            "virtualMachines, CPU_USAGE, azure_virtualmachines_cpu_usage",
-            "Microsoft.Compute/VirtualMachines, CPU, azure_virtualmachines_cpu"
-    })
-    public void testCreatePrometheusMetricName_validName( String azResourceType, String azMetricName, String expectedPrometheusName){
-        assertEquals(expectedPrometheusName, MetricsScraper.createPrometheusMetricName(azMetricName, azResourceType));
     }
 }
