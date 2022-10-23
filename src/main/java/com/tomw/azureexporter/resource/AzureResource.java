@@ -4,8 +4,12 @@ import lombok.*;
 
 import java.util.Map;
 
+import static lombok.AccessLevel.PACKAGE;
+import static lombok.AccessLevel.PUBLIC;
+
 @Data
 @Builder
+@RequiredArgsConstructor(access = PUBLIC)
 public class AzureResource {
 
     @NonNull
@@ -14,7 +18,7 @@ public class AzureResource {
     @NonNull
     private final String type;
 
-    @Getter(AccessLevel.PACKAGE)
+    @Getter(PACKAGE)
     @NonNull
     private final Map<String, String> tags;
 

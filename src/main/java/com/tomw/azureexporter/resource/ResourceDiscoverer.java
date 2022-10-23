@@ -36,25 +36,27 @@ public class ResourceDiscoverer {
         QueryRequest query = new QueryRequest().withQuery("Resources").withOptions(new QueryRequestOptions().withResultFormat(ResultFormat.OBJECT_ARRAY));
         QueryResponse response = resourceManager.resourceProviders().resources(query);
         saveResources(response);
-        log.info("Refreshed Azure resource information.");
+        log.info("Refreshed Azure resource information. Found resources for types: {}", getDiscoveredResourceTypes());
         log.debug("Full resource collection: {}", resources);
     }
 
     private void saveResources(QueryResponse response) {
+        Map<String, Set<AzureResource>> refreshedResources = new ConcurrentHashMap<>();
         ((List<Map<String, Object>>) response.data()).stream().forEach(responseMap -> {
             AzureResource resource = convertMapToResource(responseMap);
-            saveResource(resource);
+            saveResource(resource, refreshedResources);
         });
+        this.resources = refreshedResources;
     }
 
     /*package*/ AzureResource convertMapToResource(final Map<String, Object> responseMap){
         return new AzureResource((String) responseMap.get("id"), (String) responseMap.get("type"), (Map<String, String>) responseMap.getOrDefault("tags", new HashMap<>()));
     }
 
-    private void saveResource(AzureResource resource) {
+    private void saveResource(AzureResource resource, Map<String, Set<AzureResource>> resourceMap) {
         String lowerCaseType = resource.getType().toLowerCase();
-        resources.putIfAbsent(lowerCaseType, new HashSet<>());
-        resources.get(lowerCaseType).add(resource);
+        resourceMap.putIfAbsent(lowerCaseType, new HashSet<>());
+        resourceMap.get(lowerCaseType).add(resource);
     }
 
     public Set<AzureResource> getResourcesForType(final String type) {

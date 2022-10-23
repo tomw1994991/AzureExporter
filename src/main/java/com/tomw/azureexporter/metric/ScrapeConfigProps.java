@@ -13,9 +13,9 @@ import java.util.List;
 @Getter
 @Setter
 @Configuration
-public class MetricScrapeConfig {
+public class ScrapeConfigProps {
 
     private int granularityInMins = 5;
     private int intervalInMillis = 300000;
-    private List<MetricConfig> metrics;
+    private List<ResourceTypeConfig> resourceTypeConfigs;
 }

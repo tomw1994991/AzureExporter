@@ -32,7 +32,7 @@ public class MetricsScraper {
     private MetricsQueryClient metricsQueryClient;
     private final MetricsQueryOptions defaultQueryOptions;
 
-    private final MetricScrapeConfig scrapeConfig;
+    private final ScrapeConfigProps scrapeConfig;
     private final ResourceDiscoverer resourceDiscoverer;
 
     private final MeterRegistry meterRegistry;
@@ -40,7 +40,7 @@ public class MetricsScraper {
     private final static String OUTPUT_METRIC_PREFIX = "azure";
 
 
-    public MetricsScraper(MetricScrapeConfig scrapeConfig, ResourceDiscoverer resourceDiscoverer, MeterRegistry meterRegistry) {
+    public MetricsScraper(ScrapeConfigProps scrapeConfig, ResourceDiscoverer resourceDiscoverer, MeterRegistry meterRegistry) {
         metricsQueryClient = new MetricsQueryClientBuilder()
                 .credential(new DefaultAzureCredentialBuilder().build())
                 .buildClient();
@@ -58,17 +58,17 @@ public class MetricsScraper {
         //TODO - do resource types in parallel?
         //TODO - play around with interval, granularity and window via api
         log.info("Beginning scrape of Azure resources for metrics.");
-        scrapeConfig.getMetrics().forEach(metricConfig -> {
-            scrapeResourceType(metricConfig);
+        scrapeConfig.getResourceTypeConfigs().forEach(resourceType -> {
+            scrapeResourceType(resourceType);
         });
         log.info("Finished scrape of Azure resources for metrics.");
     }
 
-    private void scrapeResourceType(MetricConfig metric) {
-        log.info("Scraping metrics for resource type: {})", metric.getResourceType());
-        Set<AzureResource> resources = resourceDiscoverer.getResourcesForType(metric.getResourceType());
+    private void scrapeResourceType(ResourceTypeConfig resourceType) {
+        log.info("Scraping metrics for resource type: {})", resourceType.getResourceType());
+        Set<AzureResource> resources = resourceDiscoverer.getResourcesForType(resourceType.getResourceType());
         resources.forEach(resource -> {
-            scrapeResource(resource, metric.getMetricNames());
+            scrapeResource(resource, resourceType.getMetricNames());
         });
     }
 
@@ -87,7 +87,6 @@ public class MetricsScraper {
 
     private void registerMetric(MetricResult metric, AzureResource resource) {
         metric.getTimeSeries().forEach(dataPoint -> {
-
             Counter.builder(createPrometheusMetricName(metric.getMetricName(), resource.getType())).tag("id", resource.getId()).description(metric.getDescription()).register(meterRegistry);
         });
         log.debug("Registered metric: {}", metric);

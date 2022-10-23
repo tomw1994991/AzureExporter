@@ -3,8 +3,6 @@ package com.tomw.azureexporter.resource;
 import com.azure.resourcemanager.resourcegraph.ResourceGraphManager;
 import com.azure.resourcemanager.resourcegraph.models.QueryResponse;
 import com.azure.resourcemanager.resourcegraph.models.ResourceProviders;
-import com.tomw.azureexporter.resource.AzureResource;
-import com.tomw.azureexporter.resource.ResourceDiscoverer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class AzureResourceDiscovererTest {
+public class ResourceDiscovererTest {
 
     ResourceDiscoverer resourceDiscoverer;
     ResourceGraphManager resourceGraphManager = mock(ResourceGraphManager.class);
@@ -40,16 +38,14 @@ public class AzureResourceDiscovererTest {
     public void testDiscoverResources_noMatchingResources_noError(String type) {
         defaultQueryResponse();
         resourceDiscoverer.discoverResources();
-        Set<AzureResource> resources = resourceDiscoverer.getResourcesForType(type);
-        assertEquals(resources.size(), 0);
+        assertEquals(0, resourceDiscoverer.getResourcesForType(type).size());
     }
 
     @Test
     public void testDiscoverResources_matchingResources_returned() {
         defaultQueryResponse();
         resourceDiscoverer.discoverResources();
-        Set<AzureResource> resources = resourceDiscoverer.getResourcesForType("storage");
-        assertEquals(resources.size(), 1);
+        assertEquals(1, resourceDiscoverer.getResourcesForType("storage").size());
     }
 
     @Test
@@ -61,9 +57,22 @@ public class AzureResourceDiscovererTest {
 
         setupQueryResponseFromResourceMaps(Arrays.asList(resource, resource2, resource3));
         resourceDiscoverer.discoverResources();
-        Set<AzureResource> resources = resourceDiscoverer.getResourcesForType("STORage");
-        assertEquals(resources.size(), 2);
+        assertEquals(2, resourceDiscoverer.getResourcesForType("STORage").size());
     }
+
+    @Test
+    public void testGetResourcesForType_deletedResource_deletedFromCollection() {
+
+        Map<String, Object> resource = setupResourceMap("id1", "storage", new HashMap<>());
+        setupQueryResponseFromResourceMaps(Arrays.asList(resource));
+        resourceDiscoverer.discoverResources();
+        assertEquals(1, resourceDiscoverer.getResourcesForType("storage").size());
+
+        setupQueryResponseFromResourceMaps(new ArrayList<Map<String, Object>>());
+        resourceDiscoverer.discoverResources();
+        assertEquals(0, resourceDiscoverer.getResourcesForType("storage").size());
+    }
+
 
     @Test
     public void testGetResourcesForType_resourcesNotYetDiscovered() {

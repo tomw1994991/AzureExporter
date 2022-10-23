@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 
 public class MetricsScraperTest {
 
-    MetricScrapeConfig config = new MetricScrapeConfig();
+    ScrapeConfigProps config = new ScrapeConfigProps();
 
     ResourceDiscoverer resourceDiscoverer = mock(ResourceDiscoverer.class);
 
