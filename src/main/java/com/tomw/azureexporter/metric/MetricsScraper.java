@@ -19,6 +19,10 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import static java.lang.Thread.currentThread;
 
 @Component
 @Slf4j
@@ -33,6 +37,8 @@ public class MetricsScraper {
 
     private final MetricRegistry metricRegistry;
 
+    private final ExecutorService executor;
+
 
     public MetricsScraper(ScrapeConfigProps scrapeConfig, ResourceDiscoverer resourceDiscoverer, MetricRegistry metricRegistry) {
         metricsQueryClient = new MetricsQueryClientBuilder()
@@ -42,38 +48,42 @@ public class MetricsScraper {
         this.scrapeConfig = scrapeConfig;
         this.resourceDiscoverer = resourceDiscoverer;
         this.metricRegistry = metricRegistry;
+        this.executor = Executors.newFixedThreadPool(scrapeConfig.getThreads());
     }
 
     @Scheduled(initialDelay = 4000L, fixedDelayString = "${scrape.interval-in-millis:300000}")
-    public void scrapeAllResources(){
-        //TODO - warnings about lombok & about unsafe method in discoverer
-        //TODO - do resource types in parallel?
+    public void scrapeAllResources() {
+        //TODO - warnings about about unsafe method in discoverer
         //TODO - play around with interval, granularity and window via api - should null value be stored
         log.info("Beginning scrape of Azure resources for metrics.");
         scrapeConfig.getResourceTypeConfigs().forEach(resourceType -> {
-            scrapeResourceType(resourceType);
+            Runnable task = () -> scrapeResourceType(resourceType);
+            executor.submit(task);
         });
         log.info("Finished scrape of Azure resources for metrics.");
     }
 
+
     private void scrapeResourceType(ResourceTypeConfig resourceType) {
-        log.info("Scraping metrics for resource type: {})", resourceType.getResourceType());
+        log.debug("[{}] Scraping metrics for resource type: {})", currentThread().getName(), resourceType.getResourceType());
         Set<AzureResource> resources = resourceDiscoverer.getResourcesForType(resourceType.getResourceType());
         resources.forEach(resource -> {
             scrapeResource(resource, resourceType.getMetricNames());
         });
+        log.debug("[{}] Finished scraping metrics for resource type: {})", currentThread().getName(), resourceType.getResourceType());
     }
 
     public void scrapeResource(AzureResource resource, List<String> metricsToQuery) {
-        log.info("Retrieving metrics for resource: {}", resource);
+        log.debug("[{}] Retrieving metrics for resource: {}", currentThread().getName(), resource.getId());
         Response<MetricsQueryResult> metricsResponse = metricsQueryClient
                 .queryResourceWithResponse(resource.getId(), metricsToQuery, setMetricsQueryInterval(defaultQueryOptions, scrapeConfig.getIntervalInMillis()),
                         Context.NONE);
         MetricsQueryResult result = metricsResponse.getValue();
         result.getMetrics().forEach(metric -> metricRegistry.registerMetric(metric, resource));
+        log.debug("[{}] Retrieved metrics for resource: {}", currentThread().getName(), resource.getId());
     }
 
-    /* package */ MetricsQueryOptions setMetricsQueryInterval(MetricsQueryOptions options, int intervalInMillis){
+    /* package */ MetricsQueryOptions setMetricsQueryInterval(MetricsQueryOptions options, int intervalInMillis) {
         return options.setTimeInterval(QueryTimeInterval.parse(Duration.ofMillis(intervalInMillis).toString()));
     }
 }
