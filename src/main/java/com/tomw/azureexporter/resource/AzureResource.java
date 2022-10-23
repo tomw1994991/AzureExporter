@@ -1,4 +1,4 @@
-package com.tomw.azureexporter;
+package com.tomw.azureexporter.resource;
 
 import lombok.*;
 

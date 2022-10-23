@@ -1,6 +1,8 @@
-package com.tomw.azureexporter;
+package com.tomw.azureexporter.metric;
 
 import com.azure.monitor.query.models.MetricsQueryOptions;
+import com.tomw.azureexporter.resource.AzureResource;
+import com.tomw.azureexporter.resource.ResourceDiscoverer;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

@@ -1,8 +1,10 @@
-package com.tomw.azureexporter;
+package com.tomw.azureexporter.resource;
 
 import com.azure.resourcemanager.resourcegraph.ResourceGraphManager;
 import com.azure.resourcemanager.resourcegraph.models.QueryResponse;
 import com.azure.resourcemanager.resourcegraph.models.ResourceProviders;
+import com.tomw.azureexporter.resource.AzureResource;
+import com.tomw.azureexporter.resource.ResourceDiscoverer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

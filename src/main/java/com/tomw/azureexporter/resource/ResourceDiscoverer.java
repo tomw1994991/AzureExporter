@@ -1,4 +1,4 @@
-package com.tomw.azureexporter;
+package com.tomw.azureexporter.resource;
 
 import com.azure.core.management.AzureEnvironment;
 import com.azure.core.management.profile.AzureProfile;

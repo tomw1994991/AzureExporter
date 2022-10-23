@@ -1,4 +1,4 @@
-package com.tomw.azureexporter;
+package com.tomw.azureexporter.metric;
 
 import com.azure.core.http.rest.Response;
 import com.azure.core.util.Context;
@@ -9,6 +9,8 @@ import com.azure.monitor.query.models.MetricResult;
 import com.azure.monitor.query.models.MetricsQueryOptions;
 import com.azure.monitor.query.models.MetricsQueryResult;
 import com.azure.monitor.query.models.QueryTimeInterval;
+import com.tomw.azureexporter.resource.AzureResource;
+import com.tomw.azureexporter.resource.ResourceDiscoverer;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.AccessLevel;
@@ -85,6 +87,7 @@ public class MetricsScraper {
 
     private void registerMetric(MetricResult metric, AzureResource resource) {
         metric.getTimeSeries().forEach(dataPoint -> {
+
             Counter.builder(createPrometheusMetricName(metric.getMetricName(), resource.getType())).tag("id", resource.getId()).description(metric.getDescription()).register(meterRegistry);
         });
         log.debug("Registered metric: {}", metric);
