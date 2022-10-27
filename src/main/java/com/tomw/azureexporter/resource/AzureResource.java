@@ -26,7 +26,7 @@ public class AzureResource {
         return tags.get(key);
     }
 
-    public boolean hasTag(final String key){
+    public boolean hasTag(final String key) {
         return tags.containsKey(key);
     }
 }

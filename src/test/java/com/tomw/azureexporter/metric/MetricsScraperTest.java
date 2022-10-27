@@ -1,21 +1,16 @@
 package com.tomw.azureexporter.metric;
 
-import com.azure.monitor.query.MetricsQueryClient;
-import com.azure.monitor.query.models.MetricsQueryOptions;
 import com.tomw.azureexporter.resource.AzureResource;
 import com.tomw.azureexporter.resource.ResourceDiscoverer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.Duration;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -29,42 +24,40 @@ public class MetricsScraperTest {
     @Autowired
     MetricRegistry metricRegistry;
 
-    MetricsScraper metricsScraper = new MetricsScraper(config, resourceDiscoverer, metricRegistry);
+    AzureMonitorMetricsClient metricsClient = mock(AzureMonitorMetricsClient.class);
 
-    MetricsQueryClient queryClient = mock(MetricsQueryClient.class);
+    MetricsScraper metricsScraper = new MetricsScraper(config, resourceDiscoverer, metricRegistry, metricsClient);
 
     @BeforeEach
-    public void setup(){
-      metricsScraper.setMetricsQueryClient(queryClient);
-      when(queryClient.queryResource(any(), any())).thenReturn(null); //TODO - what does azure do if resource not found
-    }
-
-    //@Test
-    public void testScrapeResource_resourceNotFound_error(){
-        when(resourceDiscoverer.getResourcesForType("type")).thenReturn(new HashSet<>());
-        AzureResource resource = new AzureResource("id", "type", new HashMap<>());
-        metricsScraper.scrapeResource(resource, Arrays.asList("Metric1"));
-        //TODO
+    public void setup() {
+        config.setResourceTypeConfigs(List.of(
+                new ResourceTypeConfig("type1", List.of("metric1", "metric2"))
+        ));
+        when(metricsClient.retrieveResourceMetrics(any(), any())).thenReturn(new ArrayList<>());
     }
 
     @Test
-    public void testScrapeResource_resourceHasNoMetrics_success(){
+    public void testScrapeResources_resourceNotFound_error() {
+        AzureResource resource = new AzureResource("id", "type1", new HashMap<>());
+        when(resourceDiscoverer.getResourcesForType("type1")).thenReturn(Set.of(resource));
+        metricsScraper.scrapeAllResources();
+        //TODO - what should happen when resource not found (e.g. it has been deleted)
+    }
+
+    @Test
+    public void testScrapeResource_resourceHasNoMetrics_success() {
 
     }
 
     @Test
-    public void testScrapeResource_resourceHasMetrics_metricsReturned(){}
+    public void testScrapeResource_resourceHasMetrics_metricsReturned() {
+    }
 
     @Test
-    public void testScrapeResourcesForType_happyPath(){}
+    public void testScrapeResourcesForType_happyPath() {
+    }
 
     @Test
-    public void testScrapeResourcesForType_noResources_success(){}
-
-    @ParameterizedTest
-    @ValueSource( ints = {0,1,3000,100000000})
-    public void testQueryWithTimeInterval_noErrors(int timeInterval){
-        MetricsQueryOptions queryWithTimeInterval = metricsScraper.setMetricsQueryInterval(new MetricsQueryOptions(), timeInterval);
-        assertEquals( Duration.ofMillis(timeInterval), queryWithTimeInterval.getTimeInterval().getDuration());
+    public void testScrapeResourcesForType_noResources_success() {
     }
 }

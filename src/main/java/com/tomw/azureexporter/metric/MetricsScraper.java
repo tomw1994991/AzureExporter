@@ -1,22 +1,12 @@
 package com.tomw.azureexporter.metric;
 
-import com.azure.core.http.rest.Response;
-import com.azure.core.util.Context;
-import com.azure.identity.DefaultAzureCredentialBuilder;
-import com.azure.monitor.query.MetricsQueryClient;
-import com.azure.monitor.query.MetricsQueryClientBuilder;
-import com.azure.monitor.query.models.MetricsQueryOptions;
-import com.azure.monitor.query.models.MetricsQueryResult;
-import com.azure.monitor.query.models.QueryTimeInterval;
+import com.azure.monitor.query.models.MetricResult;
 import com.tomw.azureexporter.resource.AzureResource;
 import com.tomw.azureexporter.resource.ResourceDiscoverer;
-import lombok.AccessLevel;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -28,9 +18,6 @@ import static java.lang.Thread.currentThread;
 @Slf4j
 public class MetricsScraper {
 
-    @Setter(AccessLevel.PACKAGE)
-    private MetricsQueryClient metricsQueryClient;
-    private final MetricsQueryOptions defaultQueryOptions;
 
     private final ScrapeConfigProps scrapeConfig;
     private final ResourceDiscoverer resourceDiscoverer;
@@ -39,12 +26,11 @@ public class MetricsScraper {
 
     private final ExecutorService executor;
 
+    private final AzureMonitorMetricsClient metricsClient;
 
-    public MetricsScraper(ScrapeConfigProps scrapeConfig, ResourceDiscoverer resourceDiscoverer, MetricRegistry metricRegistry) {
-        metricsQueryClient = new MetricsQueryClientBuilder()
-                .credential(new DefaultAzureCredentialBuilder().build())
-                .buildClient();
-        defaultQueryOptions = new MetricsQueryOptions().setGranularity(Duration.ofMinutes(scrapeConfig.getGranularityInMins()));
+
+    public MetricsScraper(ScrapeConfigProps scrapeConfig, ResourceDiscoverer resourceDiscoverer, MetricRegistry metricRegistry, AzureMonitorMetricsClient metricsClient) {
+        this.metricsClient = metricsClient;
         this.scrapeConfig = scrapeConfig;
         this.resourceDiscoverer = resourceDiscoverer;
         this.metricRegistry = metricRegistry;
@@ -65,26 +51,22 @@ public class MetricsScraper {
 
 
     private void scrapeResourceType(ResourceTypeConfig resourceType) {
-        log.debug("[{}] Scraping metrics for resource type: {})", currentThread().getName(), resourceType.getResourceType());
-        Set<AzureResource> resources = resourceDiscoverer.getResourcesForType(resourceType.getResourceType());
+        log.debug("[{}] Scraping metrics for resource type: {})", currentThread().getName(), resourceType.resourceType());
+        Set<AzureResource> resources = resourceDiscoverer.getResourcesForType(resourceType.resourceType());
         resources.forEach(resource -> {
-            scrapeResource(resource, resourceType.getMetrics());
+            scrapeResource(resource, resourceType.metrics());
         });
-        log.debug("[{}] Finished scraping metrics for resource type: {})", currentThread().getName(), resourceType.getResourceType());
+        log.debug("[{}] Finished scraping metrics for {} resources of type: {})", currentThread().getName(), resources.size(), resourceType.resourceType());
     }
 
     public void scrapeResource(AzureResource resource, List<String> metricsToQuery) {
-        log.debug("[{}] Retrieving metrics for resource: {}", currentThread().getName(), resource.getId());
-        Response<MetricsQueryResult> metricsResponse = metricsQueryClient
-                .queryResourceWithResponse(resource.getId(), metricsToQuery, setMetricsQueryInterval(defaultQueryOptions, scrapeConfig.getIntervalInMillis()),
-                        Context.NONE);
-        MetricsQueryResult result = metricsResponse.getValue();
-        result.getMetrics().forEach(metric -> metricRegistry.registerMetric(metric, resource));
-        log.debug("[{}] Retrieved metrics for resource: {}", currentThread().getName(), resource.getId());
-    }
-
-    /* package */ MetricsQueryOptions setMetricsQueryInterval(MetricsQueryOptions options, int intervalInMillis) {
-        options.setTimeInterval(QueryTimeInterval.parse(Duration.ofMillis(intervalInMillis).toString()));
-        return options;
+        try{
+            log.debug("[{}] Retrieving metrics for resource: {}", currentThread().getName(), resource.getId());
+            List<MetricResult> metrics = metricsClient.retrieveResourceMetrics(resource, metricsToQuery);
+            metrics.forEach(metric -> metricRegistry.registerMetric(metric, resource));
+            log.debug("[{}] Retrieved {} metric results for resource: {}", currentThread().getName(), metrics.size(), resource.getId());
+        } catch (RuntimeException ex) {
+            log.error("Unexpected error retrieving metrics for resource {}", resource, ex);
+        }
     }
 }

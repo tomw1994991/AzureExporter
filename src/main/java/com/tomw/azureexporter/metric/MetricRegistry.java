@@ -34,7 +34,7 @@ public class MetricRegistry {
         Double value = getValueFromAzMetricValues(dataPoint.getValues().get(0));
         if (value != null) {
             Gauge gauge = Gauge.builder(promMetric, () -> value).tag("id", substringAfterSlash(resource.getId()))
-                .description(metric.getDescription()).baseUnit(metric.getUnit().toString().toLowerCase(Locale.ROOT)).register(prometheusRegistry);
+                    .description(metric.getDescription()).baseUnit(metric.getUnit().toString().toLowerCase(Locale.ROOT)).register(prometheusRegistry);
         }
     }
 

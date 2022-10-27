@@ -86,22 +86,22 @@ public class ResourceDiscovererTest {
             "web.address/abc1234/defgh56789/aoaisdjoij, Types.storage",
     })
     public void testConvertMapToResource_validWithNoTags(String id, String type) {
-      Map<String, Object> resourceMap = setupResourceMap(id, type, new HashMap<>());
-      AzureResource resource = resourceDiscoverer.convertMapToResource(resourceMap);
-      assertEquals(resource.getId(), id);
-      assertEquals(resource.getType(), type);
-      assertEquals(0, resource.getTags().size());
+        Map<String, Object> resourceMap = setupResourceMap(id, type, new HashMap<>());
+        AzureResource resource = resourceDiscoverer.convertMapToResource(resourceMap);
+        assertEquals(resource.getId(), id);
+        assertEquals(resource.getType(), type);
+        assertEquals(0, resource.getTags().size());
     }
 
     @Test
-    public void testConvertMapToResource_nullTags(){
+    public void testConvertMapToResource_nullTags() {
         Map<String, Object> resourceMap = setupResourceMap("id1", "type1", null);
         AzureResource resource = resourceDiscoverer.convertMapToResource(resourceMap);
         assertEquals(0, resource.getTags().size());
     }
 
     @Test
-    public void testConvertMapToResource_withTags(){
+    public void testConvertMapToResource_withTags() {
         Map<String, String> tags = new HashMap<>();
         tags.put("key1", "value1");
         tags.put("key2", "value2");
@@ -112,13 +112,13 @@ public class ResourceDiscovererTest {
     }
 
     @Test
-    public void testConvertMapToResource_invalidId_error(){
+    public void testConvertMapToResource_invalidId_error() {
         Map<String, Object> resourceMap = setupResourceMap(null, "Types.storage", new HashMap<>());
         assertThrows(NullPointerException.class, () -> resourceDiscoverer.convertMapToResource(resourceMap));
     }
 
     @Test
-    public void testConvertMapToResource_invalidType_error(){
+    public void testConvertMapToResource_invalidType_error() {
         Map<String, Object> resourceMap = setupResourceMap("id123", null, new HashMap<>());
         assertThrows(NullPointerException.class, () -> resourceDiscoverer.convertMapToResource(resourceMap));
     }

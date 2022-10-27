@@ -49,7 +49,7 @@ public class ResourceDiscoverer {
         this.resources = refreshedResources;
     }
 
-    /*package*/ AzureResource convertMapToResource(final Map<String, Object> responseMap){
+    /*package*/ AzureResource convertMapToResource(final Map<String, Object> responseMap) {
         Map<String, String> tags = (Map<String, String>) responseMap.getOrDefault("tags", new HashMap<>());
         return new AzureResource((String) responseMap.get("id"), (String) responseMap.get("type"), null != tags ? tags : new HashMap<>());
     }
@@ -64,7 +64,7 @@ public class ResourceDiscoverer {
         return null == type ? new HashSet<>() : resources.getOrDefault(type.toLowerCase(), new HashSet<>());
     }
 
-    public Set<String> getDiscoveredResourceTypes(){
+    public Set<String> getDiscoveredResourceTypes() {
         return resources.keySet();
     }
 

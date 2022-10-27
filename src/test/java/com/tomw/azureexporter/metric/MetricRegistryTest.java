@@ -15,7 +15,7 @@ public class MetricRegistryTest {
             "virtualMachines, CPU_USAGE, azure_virtualmachines_cpu_usage",
             "Microsoft.Compute/VirtualMachines, CPU, azure_virtualmachines_cpu"
     })
-    public void testCreatePrometheusMetricName_validName( String azResourceType, String azMetricName, String expectedPrometheusName){
+    public void testCreatePrometheusMetricName_validName(String azResourceType, String azMetricName, String expectedPrometheusName) {
         assertEquals(expectedPrometheusName, MetricRegistry.createPrometheusMetricName(azMetricName, azResourceType));
     }
 
@@ -29,7 +29,7 @@ public class MetricRegistryTest {
             "a/, a/",
             "virtualMachines, virtualMachines",
     })
-    public void testSubstringAfterSlash_variousValues( String input, String expectedSubstring){
+    public void testSubstringAfterSlash_variousValues(String input, String expectedSubstring) {
         assertEquals(expectedSubstring, MetricRegistry.substringAfterSlash(input));
     }
 }
