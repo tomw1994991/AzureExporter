@@ -1,5 +1,7 @@
 package com.tomw.azureexporter.metric;
 
+import com.tomw.azureexporter.metric.config.ResourceTypeConfig;
+import com.tomw.azureexporter.metric.config.ScrapeConfigProps;
 import com.tomw.azureexporter.resource.AzureResource;
 import com.tomw.azureexporter.resource.ResourceDiscoverer;
 import org.junit.jupiter.api.BeforeEach;

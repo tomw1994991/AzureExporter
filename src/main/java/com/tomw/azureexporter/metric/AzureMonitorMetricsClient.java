@@ -9,6 +9,7 @@ import com.azure.monitor.query.models.MetricResult;
 import com.azure.monitor.query.models.MetricsQueryOptions;
 import com.azure.monitor.query.models.MetricsQueryResult;
 import com.azure.monitor.query.models.QueryTimeInterval;
+import com.tomw.azureexporter.metric.config.ScrapeConfigProps;
 import com.tomw.azureexporter.resource.AzureResource;
 import org.springframework.stereotype.Component;
 

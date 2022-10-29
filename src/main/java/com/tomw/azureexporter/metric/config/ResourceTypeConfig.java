@@ -1,4 +1,4 @@
-package com.tomw.azureexporter.metric;
+package com.tomw.azureexporter.metric.config;
 
 import java.util.List;
 

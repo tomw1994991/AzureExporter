@@ -38,7 +38,6 @@ public class MetricRegistry {
         }
     }
 
-    //TODO
     private static Double getValueFromAzMetricValues(MetricValue azValues) {
         Double value = azValues.getAverage();
         if (null == value) {

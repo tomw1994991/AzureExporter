@@ -1,6 +1,8 @@
 package com.tomw.azureexporter.metric;
 
 import com.azure.monitor.query.models.MetricResult;
+import com.tomw.azureexporter.metric.config.ResourceTypeConfig;
+import com.tomw.azureexporter.metric.config.ScrapeConfigProps;
 import com.tomw.azureexporter.resource.AzureResource;
 import com.tomw.azureexporter.resource.ResourceDiscoverer;
 import lombok.extern.slf4j.Slf4j;
@@ -39,9 +41,6 @@ public class MetricsScraper {
 
     @Scheduled(initialDelayString = "${scrape.initial-delay-millis:5000}", fixedDelayString = "${scrape.interval-in-millis:300000}")
     public void scrapeAllResources() {
-        //TODO - play around with interval, granularity and window via api - should null value be stored
-        //TODO - finish tests
-        log.info("Beginning scrape of Azure resources for metrics.");
         scrapeConfig.getResourceTypeConfigs().forEach(resourceType -> {
             Runnable task = () -> scrapeResourceType(resourceType);
             executor.submit(task);
@@ -51,12 +50,10 @@ public class MetricsScraper {
 
 
     private void scrapeResourceType(ResourceTypeConfig resourceType) {
-        log.debug("[{}] Scraping metrics for resource type: {})", currentThread().getName(), resourceType.resourceType());
         Set<AzureResource> resources = resourceDiscoverer.getResourcesForType(resourceType.resourceType());
         resources.forEach(resource -> {
             scrapeResource(resource, resourceType.metrics());
         });
-        log.debug("[{}] Finished scraping metrics for {} resources of type: {})", currentThread().getName(), resources.size(), resourceType.resourceType());
     }
 
     public void scrapeResource(AzureResource resource, List<String> metricsToQuery) {
