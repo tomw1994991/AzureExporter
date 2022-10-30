@@ -15,7 +15,6 @@ import java.util.List;
 @Configuration
 public class ScrapeConfigProps {
 
-    private int granularityInMins = 5;
     private int intervalInMillis = 300000;
     private int initialDelayMillis = 5000;
     private int threads = 8;

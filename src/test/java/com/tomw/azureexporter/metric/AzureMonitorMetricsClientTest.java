@@ -1,6 +1,7 @@
 package com.tomw.azureexporter.metric;
 
 import com.azure.monitor.query.models.MetricsQueryOptions;
+import com.tomw.azureexporter.metric.config.ResourceTypeConfig;
 import com.tomw.azureexporter.resource.AzureResource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,8 +22,9 @@ public class AzureMonitorMetricsClientTest {
 
     @Test
     public void test(){
-      AzureResource resource = AzureResource.builder().id("id1").type("type1").tags(new HashMap<>()).build();
-      metricsClient.retrieveResourceMetrics(resource,  List.of("metric1"));
+        ResourceTypeConfig config = new ResourceTypeConfig("type1", List.of("metric1"), 1);
+      AzureResource resource = AzureResource.builder().id("id1").type(config.resourceType()).tags(new HashMap<>()).build();
+      metricsClient.queryResourceMetrics(resource,  config);
     }
 
     @ParameterizedTest

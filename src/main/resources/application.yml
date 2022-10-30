@@ -13,16 +13,21 @@ resource-discovery:
 scrape:
   interval-in-millis: 60000
   initial-delay-millis: 5000
-  granularity-in-mins: 5
   resourceTypeConfigs:
     - resourceType: "Microsoft.Storage/storageAccounts"
+      granularity-in-mins: 5
       metrics:
-        - "Availability"
         - "Ingress"
-        - "Used capacity"
+        - "Availability"
+    - resourceType: "Microsoft.Storage/storageAccounts"
+      granularity-in-mins: 60
+      metrics:
+        - "UsedCapacity"
     - resourceType: "Microsoft.Compute/VirtualMachines"
+      granularity-in-mins: 5
       metrics:
         - "CPU"
     - resourceType: "Microsoft.Network/virtualNetworks"
+      granularity-in-mins: 5
       metrics:
-        - "Under DDos attack or not"
+        - "IfUnderDDoSAttack"

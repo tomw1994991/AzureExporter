@@ -23,11 +23,8 @@ public class MetricsScraper {
 
     private final ScrapeConfigProps scrapeConfig;
     private final ResourceDiscoverer resourceDiscoverer;
-
     private final MetricRegistry metricRegistry;
-
     private final ExecutorService executor;
-
     private final AzureMonitorMetricsClient metricsClient;
 
 
@@ -52,14 +49,14 @@ public class MetricsScraper {
     private void scrapeResourceType(ResourceTypeConfig resourceType) {
         Set<AzureResource> resources = resourceDiscoverer.getResourcesForType(resourceType.resourceType());
         resources.forEach(resource -> {
-            scrapeResource(resource, resourceType.metrics());
+            scrapeResource(resource, resourceType);
         });
     }
 
-    public void scrapeResource(AzureResource resource, List<String> metricsToQuery) {
-        try{
+    public void scrapeResource(AzureResource resource, ResourceTypeConfig config) {
+        try {
             log.debug("[{}] Retrieving metrics for resource: {}", currentThread().getName(), resource.getId());
-            List<MetricResult> metrics = metricsClient.retrieveResourceMetrics(resource, metricsToQuery);
+            List<MetricResult> metrics = metricsClient.queryResourceMetrics(resource, config);
             metrics.forEach(metric -> metricRegistry.registerMetric(metric, resource));
             log.debug("[{}] Retrieved {} metric results for resource: {}", currentThread().getName(), metrics.size(), resource.getId());
         } catch (RuntimeException ex) {

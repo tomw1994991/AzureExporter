@@ -35,7 +35,7 @@ public class MetricsScraperTest {
         config.setResourceTypeConfigs(List.of(
                 new ResourceTypeConfig("type1", List.of("metric1", "metric2"))
         ));
-        when(metricsClient.retrieveResourceMetrics(any(), any())).thenReturn(new ArrayList<>());
+        when(metricsClient.queryResourceMetrics(any(), any())).thenReturn(new ArrayList<>());
     }
 
     @Test
