@@ -35,7 +35,7 @@ public class AzureMonitorMetricsClient {
         MetricsQueryOptions queryOptions = getQueryOptions(config);
         Response<MetricsQueryResult> metricsResponse = queryClient
                 .queryResourceWithResponse(resource.getId(), config.metrics(),
-                        setMetricsQueryInterval(queryOptions, scrapeConfig.getIntervalInMillis()), Context.NONE);
+                        setMetricsQueryInterval(queryOptions, scrapeConfig.getQueryWindowInMillis()), Context.NONE);
         return getMetricResults(metricsResponse);
     }
 
@@ -45,7 +45,7 @@ public class AzureMonitorMetricsClient {
 
     private List<MetricResult> getMetricResults(Response<MetricsQueryResult> metricsResponse) {
         MetricsQueryResult result = metricsResponse.getValue();
-        return null != result.getMetrics() ? result.getMetrics() : new ArrayList<MetricResult>();
+        return null != result.getMetrics() ? result.getMetrics() : new ArrayList<>();
     }
 
     /* package */ MetricsQueryOptions setMetricsQueryInterval(MetricsQueryOptions options, int intervalInMillis) {

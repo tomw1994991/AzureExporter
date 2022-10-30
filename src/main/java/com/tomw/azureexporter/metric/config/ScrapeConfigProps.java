@@ -16,6 +16,7 @@ import java.util.List;
 public class ScrapeConfigProps {
 
     private int intervalInMillis = 300000;
+    private int queryWindowInMillis = 600000;
     private int initialDelayMillis = 5000;
     private int threads = 8;
     private List<ResourceTypeConfig> resourceTypeConfigs;

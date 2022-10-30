@@ -5,7 +5,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MetricRegistryTest {
+public class MetricsExporterTest {
 
 
     @ParameterizedTest
@@ -16,7 +16,7 @@ public class MetricRegistryTest {
             "Microsoft.Compute/VirtualMachines, CPU, azure_virtualmachines_cpu"
     })
     public void testCreatePrometheusMetricName_validName(String azResourceType, String azMetricName, String expectedPrometheusName) {
-        assertEquals(expectedPrometheusName, MetricRegistry.createPrometheusMetricName(azMetricName, azResourceType));
+        assertEquals(expectedPrometheusName, MetricExporter.convertAzNameToPromName(azMetricName, azResourceType));
     }
 
     @ParameterizedTest
@@ -30,6 +30,6 @@ public class MetricRegistryTest {
             "virtualMachines, virtualMachines",
     })
     public void testSubstringAfterSlash_variousValues(String input, String expectedSubstring) {
-        assertEquals(expectedSubstring, MetricRegistry.substringAfterSlash(input));
+        assertEquals(expectedSubstring, MetricExporter.substringAfterSlash(input));
     }
 }

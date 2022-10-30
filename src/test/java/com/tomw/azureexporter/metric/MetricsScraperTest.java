@@ -1,16 +1,13 @@
 package com.tomw.azureexporter.metric;
 
-import com.tomw.azureexporter.metric.config.ResourceTypeConfig;
 import com.tomw.azureexporter.metric.config.ScrapeConfigProps;
 import com.tomw.azureexporter.resource.AzureResource;
 import com.tomw.azureexporter.resource.ResourceDiscoverer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -23,18 +20,12 @@ public class MetricsScraperTest {
 
     ResourceDiscoverer resourceDiscoverer = mock(ResourceDiscoverer.class);
 
-    @Autowired
-    MetricRegistry metricRegistry;
-
     AzureMonitorMetricsClient metricsClient = mock(AzureMonitorMetricsClient.class);
 
-    MetricsScraper metricsScraper = new MetricsScraper(config, resourceDiscoverer, metricRegistry, metricsClient);
+    MetricsScraper metricsScraper = new MetricsScraper(config, resourceDiscoverer, metricsClient);
 
     @BeforeEach
     public void setup() {
-        config.setResourceTypeConfigs(List.of(
-                new ResourceTypeConfig("type1", List.of("metric1", "metric2"))
-        ));
         when(metricsClient.queryResourceMetrics(any(), any())).thenReturn(new ArrayList<>());
     }
 

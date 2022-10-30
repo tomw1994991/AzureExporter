@@ -23,16 +23,14 @@ public class MetricsScraper {
 
     private final ScrapeConfigProps scrapeConfig;
     private final ResourceDiscoverer resourceDiscoverer;
-    private final MetricRegistry metricRegistry;
     private final ExecutorService executor;
     private final AzureMonitorMetricsClient metricsClient;
 
 
-    public MetricsScraper(ScrapeConfigProps scrapeConfig, ResourceDiscoverer resourceDiscoverer, MetricRegistry metricRegistry, AzureMonitorMetricsClient metricsClient) {
+    public MetricsScraper(ScrapeConfigProps scrapeConfig, ResourceDiscoverer resourceDiscoverer, AzureMonitorMetricsClient metricsClient) {
         this.metricsClient = metricsClient;
         this.scrapeConfig = scrapeConfig;
         this.resourceDiscoverer = resourceDiscoverer;
-        this.metricRegistry = metricRegistry;
         this.executor = Executors.newFixedThreadPool(scrapeConfig.getThreads());
     }
 
@@ -57,7 +55,7 @@ public class MetricsScraper {
         try {
             log.debug("[{}] Retrieving metrics for resource: {}", currentThread().getName(), resource.getId());
             List<MetricResult> metrics = metricsClient.queryResourceMetrics(resource, config);
-            metrics.forEach(metric -> metricRegistry.registerMetric(metric, resource));
+            MetricExporter.builder().metricData(metrics).resource(resource).build().register();
             log.debug("[{}] Retrieved {} metric results for resource: {}", currentThread().getName(), metrics.size(), resource.getId());
         } catch (RuntimeException ex) {
             log.error("Unexpected error retrieving metrics for resource {}", resource, ex);
