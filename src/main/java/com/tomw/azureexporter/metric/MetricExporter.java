@@ -64,7 +64,7 @@ public class MetricExporter extends Collector {
     }
 
     private void removeExpiredData(List<MetricFamilySamples.Sample> existingData) {
-        existingData.stream().filter(data -> !isExpiredData(data)).toList();
+        existingData.removeIf(data -> isExpiredData(data));
     }
 
     private void addNewData(List<MetricFamilySamples.Sample> samples, PrometheusMetric metric) {
