@@ -9,13 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 import static java.lang.Thread.currentThread;
 
@@ -44,16 +40,16 @@ public class AzureMetricsScraper {
         List<PrometheusMetric> metrics = queryResourceTypeMetrics(resourceType);
         saveMetrics(metrics);
         log.info("Saved {} metric result(s) for resource type {}", metrics.size(), resourceType);
-        log.debug("Saved metric data: {}", metrics);//TODO - debug
+        log.debug("Saved metric data: {}", metrics);
     }
 
     private List<PrometheusMetric> queryResourceTypeMetrics(ResourceTypeConfig resourceType) {
         Set<AzureResource> resources = resourceDiscoverer.getResourcesForType(resourceType.resourceType());
-        return resources.stream().map(resource -> queryResourceMetrics(resource, resourceType)).flatMap(nestedList -> nestedList.stream()).collect(Collectors.toList());
+        return resources.stream().map(resource -> queryResourceMetrics(resource, resourceType)).flatMap(Collection::stream).toList();
     }
 
     private void saveMetrics(List<PrometheusMetric> metrics) {
-        metrics.stream().forEach(
+        metrics.forEach(
             metric -> MetricExporter.forMetric(metric).withRetention(scrapeConfig.getIntervalInMillis()).saveMetric(metric)
         );
     }

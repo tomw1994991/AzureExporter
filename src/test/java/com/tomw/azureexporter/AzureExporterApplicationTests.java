@@ -7,8 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 @AutoConfigureObservability
 class AzureExporterApplicationTests {
-
-
+    
     @Test
     void contextLoads() {
     }

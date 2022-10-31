@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 
 @Slf4j
@@ -22,9 +23,8 @@ public class PrometheusMetric {
     private final String name;
     @Getter
     private final String description;
-
     @Getter
-    private List<Collector.MetricFamilySamples.Sample> dataPoints = new ArrayList<>();
+    private final List<Collector.MetricFamilySamples.Sample> dataPoints = new ArrayList<>();
 
 
     public PrometheusMetric(String rawResourceType, MetricResult azureMetric, String resourceId, String metricDescription){
@@ -51,14 +51,14 @@ public class PrometheusMetric {
 
     private Collector.MetricFamilySamples.Sample convertMetricValueToPrometheus(MetricValue metricValue) {
         Double value = getValueFromAzMetricValues(metricValue);
-        Collector.MetricFamilySamples.Sample sample = new Collector.MetricFamilySamples.Sample(getName(),
-                List.of("id"), List.of(MetricNaming.substringAfterSlash(resourceId)), value, metricValue.getTimeStamp().toInstant().toEpochMilli());
-        return sample;
+        return new Collector.MetricFamilySamples.Sample(getName(),
+                List.of("id"), List.of(MetricNaming.substringAfterSlash(resourceId)),
+                value, metricValue.getTimeStamp().toInstant().toEpochMilli());
     }
 
     private static Double getValueFromAzMetricValues(MetricValue azValues) {
         List<Double> values = Arrays.asList(azValues.getAverage(), azValues.getTotal(), azValues.getMaximum(), azValues.getMaximum());
-        return values.stream().filter(value -> null != value).findFirst().orElseThrow(NoMetricValueException::new);
+        return values.stream().filter(Objects::nonNull).findFirst().orElseThrow(NoMetricValueException::new);
     }
 
     public boolean hasData() {

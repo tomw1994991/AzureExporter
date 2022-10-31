@@ -7,11 +7,11 @@ management:
           - prometheus
 
 resource-discovery:
-  interval-in-millis: 300000
+  interval-in-millis: 450000
   initial-delay-millis: 500
 
 scrape:
-  interval-in-millis: 60000
+  interval-in-millis: 300000
   query-window-in-millis: 600000
   initial-delay-millis: 5000
   resourceTypeConfigs:

@@ -41,13 +41,12 @@ public class MetricExporter extends Collector {
         return List.of(metricData);
     }
 
-    public MetricExporter saveMetric(PrometheusMetric metric) {
+    public void saveMetric(PrometheusMetric metric) {
         removeExpiredData(metricData.samples);
         addNewData(metricData.samples, metric);
         if (log.isDebugEnabled()){
             log.debug("Saved metric data: {}", metricData.samples);
         }
-        return this;
     }
 
     public MetricExporter withRetention(long metricDataExpirationMillis){
@@ -64,7 +63,7 @@ public class MetricExporter extends Collector {
     }
 
     private void removeExpiredData(List<MetricFamilySamples.Sample> existingData) {
-        existingData.removeIf(data -> isExpiredData(data));
+        existingData.removeIf(this::isExpiredData);
     }
 
     private void addNewData(List<MetricFamilySamples.Sample> samples, PrometheusMetric metric) {
@@ -73,6 +72,6 @@ public class MetricExporter extends Collector {
 
     private boolean isExpiredData(MetricFamilySamples.Sample data) {
         Instant expiryDate = Instant.now().minusMillis(metricDataExpirationMillis);
-        return Instant.ofEpochMilli(data.timestampMs.longValue()).isBefore(expiryDate);
+        return Instant.ofEpochMilli(data.timestampMs).isBefore(expiryDate);
     }
 }

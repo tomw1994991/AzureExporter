@@ -12,6 +12,7 @@ import com.azure.monitor.query.models.QueryTimeInterval;
 import com.tomw.azureexporter.config.ResourceTypeConfig;
 import com.tomw.azureexporter.config.ScrapeConfigProps;
 import com.tomw.azureexporter.resource.AzureResource;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -22,16 +23,16 @@ import java.util.List;
 public class AzureMonitorMetricsClient {
 
     private final ScrapeConfigProps scrapeConfig;
-    private MetricsQueryClient queryClient;
+    private final MetricsQueryClient queryClient;
 
-    public AzureMonitorMetricsClient(ScrapeConfigProps scrapeConfig) {
+    public AzureMonitorMetricsClient(@NotNull ScrapeConfigProps scrapeConfig) {
         this.scrapeConfig = scrapeConfig;
         queryClient = new MetricsQueryClientBuilder()
                 .credential(new DefaultAzureCredentialBuilder().build())
                 .buildClient();
     }
 
-    public List<PrometheusMetric> queryResourceMetrics(AzureResource resource, ResourceTypeConfig config) {
+    public List<PrometheusMetric> queryResourceMetrics(@NotNull AzureResource resource, @NotNull ResourceTypeConfig config) {
         MetricsQueryOptions queryOptions = getQueryOptions(config);
         Response<MetricsQueryResult> metricsResponse = queryClient
                 .queryResourceWithResponse(resource.getId(), config.metrics(),
@@ -47,8 +48,7 @@ public class AzureMonitorMetricsClient {
       List<MetricResult> metricResults = getMetricResponseResults(metricsResponse);
       return metricResults.stream()
               .map(metricResult -> new PrometheusMetric(resource.getType(), metricResult, resource.getId(), metricResult.getDescription()))
-              .filter(promMetric -> promMetric.hasData())
-              .toList();
+              .filter(PrometheusMetric::hasData).toList();
     }
 
 
@@ -61,5 +61,4 @@ public class AzureMonitorMetricsClient {
         options.setTimeInterval(QueryTimeInterval.parse(Duration.ofMillis(intervalInMillis).toString()));
         return options;
     }
-
 }

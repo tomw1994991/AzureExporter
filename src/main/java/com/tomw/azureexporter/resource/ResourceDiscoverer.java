@@ -42,7 +42,7 @@ public class ResourceDiscoverer {
 
     private void saveResources(QueryResponse response) {
         Map<String, Set<AzureResource>> refreshedResources = new ConcurrentHashMap<>();
-        ((List<Map<String, Object>>) response.data()).stream().forEach(responseMap -> {
+        ((List<Map<String, Object>>) response.data()).forEach(responseMap -> {
             AzureResource resource = convertMapToResource(responseMap);
             saveResource(resource, refreshedResources);
         });

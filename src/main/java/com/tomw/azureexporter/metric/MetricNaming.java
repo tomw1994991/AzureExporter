@@ -11,17 +11,16 @@ public abstract class MetricNaming {
 
     public static String computePrometheusMetricName(String resourceType, String azureMetric){
         return String.join("_", OUTPUT_METRIC_PREFIX, resourceType,
-                replaceNonAlphanumeric(azureMetric, DEFAULT_SEPARATOR)).toLowerCase(Locale.ROOT);
+                replaceNonAlphanumericWithSeparator(azureMetric)).toLowerCase(Locale.ROOT);
     }
 
-    private static String replaceNonAlphanumeric(final String original, final String replacement) {
-        return original.replaceAll("[^A-Za-z\\d]", replacement);
+    private static String replaceNonAlphanumericWithSeparator(final String original) {
+        return original.replaceAll("[^A-Za-z\\d]", MetricNaming.DEFAULT_SEPARATOR);
     }
 
-    /* package*/ static final String substringAfterSlash(String original) {
+    /* package*/ static String substringAfterSlash(String original) {
         String sanitisedInput = Objects.requireNonNullElse(original, "");
         int lastSlash = sanitisedInput.lastIndexOf("/");
-        String afterSlash = (lastSlash > 0 && lastSlash + 1 < sanitisedInput.length()) ? sanitisedInput.substring(lastSlash + 1) : sanitisedInput;
-        return afterSlash;
+        return (lastSlash > 0 && lastSlash + 1 < sanitisedInput.length()) ? sanitisedInput.substring(lastSlash + 1) : sanitisedInput;
     }
 }

@@ -18,5 +18,4 @@ public class AzureExporterApplication {
     public static void main(String[] args) {
         SpringApplication.run(AzureExporterApplication.class, args);
     }
-
 }
