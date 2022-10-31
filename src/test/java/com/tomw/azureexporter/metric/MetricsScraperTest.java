@@ -1,6 +1,6 @@
 package com.tomw.azureexporter.metric;
 
-import com.tomw.azureexporter.metric.config.ScrapeConfigProps;
+import com.tomw.azureexporter.config.ScrapeConfigProps;
 import com.tomw.azureexporter.resource.AzureResource;
 import com.tomw.azureexporter.resource.ResourceDiscoverer;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +22,7 @@ public class MetricsScraperTest {
 
     AzureMonitorMetricsClient metricsClient = mock(AzureMonitorMetricsClient.class);
 
-    MetricsScraper metricsScraper = new MetricsScraper(config, resourceDiscoverer, metricsClient);
+    AzureMetricsScraper metricsScraper = new AzureMetricsScraper(config, resourceDiscoverer, metricsClient);
 
     @BeforeEach
     public void setup() {

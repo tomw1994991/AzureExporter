@@ -9,8 +9,8 @@ import com.azure.monitor.query.models.MetricResult;
 import com.azure.monitor.query.models.MetricsQueryOptions;
 import com.azure.monitor.query.models.MetricsQueryResult;
 import com.azure.monitor.query.models.QueryTimeInterval;
-import com.tomw.azureexporter.metric.config.ResourceTypeConfig;
-import com.tomw.azureexporter.metric.config.ScrapeConfigProps;
+import com.tomw.azureexporter.config.ResourceTypeConfig;
+import com.tomw.azureexporter.config.ScrapeConfigProps;
 import com.tomw.azureexporter.resource.AzureResource;
 import org.springframework.stereotype.Component;
 
@@ -31,19 +31,28 @@ public class AzureMonitorMetricsClient {
                 .buildClient();
     }
 
-    public List<MetricResult> queryResourceMetrics(AzureResource resource, ResourceTypeConfig config) {
+    public List<PrometheusMetric> queryResourceMetrics(AzureResource resource, ResourceTypeConfig config) {
         MetricsQueryOptions queryOptions = getQueryOptions(config);
         Response<MetricsQueryResult> metricsResponse = queryClient
                 .queryResourceWithResponse(resource.getId(), config.metrics(),
                         setMetricsQueryInterval(queryOptions, scrapeConfig.getQueryWindowInMillis()), Context.NONE);
-        return getMetricResults(metricsResponse);
+        return getPrometheusMetrics(resource, metricsResponse );
     }
 
     private MetricsQueryOptions getQueryOptions(ResourceTypeConfig config){
         return new MetricsQueryOptions().setGranularity(Duration.ofMinutes(config.granularityInMins()));
     }
 
-    private List<MetricResult> getMetricResults(Response<MetricsQueryResult> metricsResponse) {
+    private List<PrometheusMetric> getPrometheusMetrics(AzureResource resource, Response<MetricsQueryResult> metricsResponse) {
+      List<MetricResult> metricResults = getMetricResponseResults(metricsResponse);
+      return metricResults.stream()
+              .map(metricResult -> new PrometheusMetric(resource.getType(), metricResult, resource.getId(), metricResult.getDescription()))
+              .filter(promMetric -> promMetric.hasData())
+              .toList();
+    }
+
+
+    private List<MetricResult> getMetricResponseResults(Response<MetricsQueryResult> metricsResponse) {
         MetricsQueryResult result = metricsResponse.getValue();
         return null != result.getMetrics() ? result.getMetrics() : new ArrayList<>();
     }

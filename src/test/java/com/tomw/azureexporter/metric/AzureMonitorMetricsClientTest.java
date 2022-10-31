@@ -1,7 +1,7 @@
 package com.tomw.azureexporter.metric;
 
 import com.azure.monitor.query.models.MetricsQueryOptions;
-import com.tomw.azureexporter.metric.config.ResourceTypeConfig;
+import com.tomw.azureexporter.config.ResourceTypeConfig;
 import com.tomw.azureexporter.resource.AzureResource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
