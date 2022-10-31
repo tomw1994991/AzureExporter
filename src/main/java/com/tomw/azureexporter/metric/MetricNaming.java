@@ -10,11 +10,11 @@ public abstract class MetricNaming {
 
 
     public static String computePrometheusMetricName(String resourceType, String azureMetric){
-        return String.join("_", OUTPUT_METRIC_PREFIX, resourceType,
-                replaceNonAlphanumericWithSeparator(azureMetric)).toLowerCase(Locale.ROOT);
+        return String.join("_", OUTPUT_METRIC_PREFIX, replaceNonAlphanumeric(substringAfterSlash(resourceType)),
+                replaceNonAlphanumeric(azureMetric)).toLowerCase(Locale.ROOT);
     }
 
-    private static String replaceNonAlphanumericWithSeparator(final String original) {
+    private static String replaceNonAlphanumeric(final String original) {
         return original.replaceAll("[^A-Za-z\\d]", MetricNaming.DEFAULT_SEPARATOR);
     }
 
