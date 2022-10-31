@@ -32,6 +32,8 @@ public class PrometheusScrapeEndpointIntegrationTests {
         MvcResult result = mockMvc.perform(get(ACTUATOR_PROMETHEUS_ENDPOINT)).andReturn();
         assertTrue(result.getResponse().getContentAsString().contains("cpu_usage"));
     }
-    
+
+    @Test
+    public void testScrapeMetrics_unexpectedException_otherMetricsStillScraped(){}
 
 }

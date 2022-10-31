@@ -12,6 +12,8 @@ import com.azure.monitor.query.models.QueryTimeInterval;
 import com.tomw.azureexporter.config.ResourceTypeConfig;
 import com.tomw.azureexporter.config.ScrapeConfigProps;
 import com.tomw.azureexporter.resource.AzureResource;
+import lombok.AccessLevel;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +25,8 @@ import java.util.List;
 public class AzureMonitorMetricsClient {
 
     private final ScrapeConfigProps scrapeConfig;
-    private final MetricsQueryClient queryClient;
+    @Setter(AccessLevel.PACKAGE)
+    private MetricsQueryClient queryClient;
 
     public AzureMonitorMetricsClient(@NotNull ScrapeConfigProps scrapeConfig) {
         this.scrapeConfig = scrapeConfig;
