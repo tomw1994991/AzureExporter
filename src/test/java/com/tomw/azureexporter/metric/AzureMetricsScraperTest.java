@@ -14,7 +14,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class MetricsScraperTest {
+public class AzureMetricsScraperTest {
 
     ScrapeConfigProps config = new ScrapeConfigProps();
 

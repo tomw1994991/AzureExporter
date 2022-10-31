@@ -2,10 +2,12 @@ package com.tomw.azureexporter.metric;
 
 import com.azure.monitor.query.models.MetricResult;
 import com.azure.monitor.query.models.MetricValue;
+import com.tomw.azureexporter.resource.AzureResource;
 import io.prometheus.client.Collector;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,10 +29,10 @@ public class PrometheusMetric {
     private final List<Collector.MetricFamilySamples.Sample> dataPoints = new ArrayList<>();
 
 
-    public PrometheusMetric(String rawResourceType, MetricResult azureMetric, String resourceId, String metricDescription){
-        this.resourceType = MetricNaming.substringAfterSlash(rawResourceType);
-        this.resourceId = resourceId;
-        this.description = metricDescription;
+    public PrometheusMetric(@NotNull AzureResource resource, @NotNull MetricResult azureMetric){
+        this.resourceType = MetricNaming.substringAfterSlash(resource.getType());
+        this.resourceId = resource.getId();
+        this.description = azureMetric.getDescription();
         this.name = MetricNaming.computePrometheusMetricName(resourceType, azureMetric.getMetricName());
         azureMetric.getTimeSeries().forEach(time -> {
             dataPoints.addAll(convertMetricValuesToPrometheus(time.getValues()));
@@ -57,7 +59,7 @@ public class PrometheusMetric {
     }
 
     private static Double getValueFromAzMetricValues(MetricValue azValues) {
-        List<Double> values = Arrays.asList(azValues.getAverage(), azValues.getTotal(), azValues.getMaximum(), azValues.getMaximum());
+        List<Double> values = Arrays.asList(azValues.getAverage(), azValues.getCount(), azValues.getTotal(), azValues.getMaximum(), azValues.getMinimum());
         return values.stream().filter(Objects::nonNull).findFirst().orElseThrow(NoMetricValueException::new);
     }
 

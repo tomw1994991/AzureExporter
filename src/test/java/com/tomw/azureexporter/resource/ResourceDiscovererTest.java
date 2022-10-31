@@ -64,7 +64,7 @@ public class ResourceDiscovererTest {
     public void testGetResourcesForType_deletedResource_deletedFromCollection() {
 
         Map<String, Object> resource = setupResourceMap("id1", "storage", new HashMap<>());
-        setupQueryResponseFromResourceMaps(Arrays.asList(resource));
+        setupQueryResponseFromResourceMaps(List.of(resource));
         resourceDiscoverer.discoverResources();
         assertEquals(1, resourceDiscoverer.getResourcesForType("storage").size());
 
@@ -125,7 +125,7 @@ public class ResourceDiscovererTest {
 
     private void defaultQueryResponse() {
         Map<String, Object> resource = setupResourceMap("id1", "storage", new HashMap<>());
-        setupQueryResponseFromResourceMaps(Arrays.asList(resource));
+        setupQueryResponseFromResourceMaps(List.of(resource));
     }
 
 

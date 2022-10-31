@@ -47,7 +47,7 @@ public class AzureMonitorMetricsClient {
     private List<PrometheusMetric> getPrometheusMetrics(AzureResource resource, Response<MetricsQueryResult> metricsResponse) {
       List<MetricResult> metricResults = getMetricResponseResults(metricsResponse);
       return metricResults.stream()
-              .map(metricResult -> new PrometheusMetric(resource.getType(), metricResult, resource.getId(), metricResult.getDescription()))
+              .map(metricResult -> new PrometheusMetric(resource, metricResult))
               .filter(PrometheusMetric::hasData).toList();
     }
 
