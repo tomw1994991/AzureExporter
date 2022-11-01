@@ -1,22 +1,25 @@
 package com.tomw.azureexporter.metric;
 
+import com.tomw.azureexporter.config.ResourceTypeConfig;
 import com.tomw.azureexporter.config.ScrapeConfigProps;
 import com.tomw.azureexporter.resource.AzureResource;
 import com.tomw.azureexporter.resource.ResourceDiscoverer;
+import io.prometheus.client.CollectorRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class AzureMetricsScraperTest {
 
-    ScrapeConfigProps config = new ScrapeConfigProps();
+    ScrapeConfigProps config = setupScrapeConfigProps();
 
     ResourceDiscoverer resourceDiscoverer = mock(ResourceDiscoverer.class);
 
@@ -26,15 +29,40 @@ public class AzureMetricsScraperTest {
 
     @BeforeEach
     public void setup() {
-        when(metricsClient.queryResourceMetrics(any(), any())).thenReturn(new ArrayList<>());
+        AzureResource resource1 = new AzureResource("vm1", "virtualMachines", new HashMap<>());
+        AzureResource resource2 = new AzureResource("vm2", "virtualMachines", new HashMap<>());
+        when(metricsClient.queryResourceMetrics(resourceWithId(resource1.getId()), resourceTypeConfigWithType(resource1.getType()))).thenReturn(populatedMetrics(resource1));
+        when(resourceDiscoverer.getResourcesForType("virtualMachines")).thenReturn(Set.of(resource1, resource2));
+    }
+
+    private List<PrometheusMetric> populatedMetrics(AzureResource resource) {
+        //TODO return List.of(new PrometheusMetric(resource, new MetricResult()));
+        return new ArrayList<>();
+    }
+
+    private ScrapeConfigProps setupScrapeConfigProps() {
+        ScrapeConfigProps props =  new ScrapeConfigProps();
+        props.setResourceTypeConfigs(defaultResourceTypeConfigs());
+        return props;
+    }
+
+    private List<ResourceTypeConfig> defaultResourceTypeConfigs() {
+        return List.of(new ResourceTypeConfig("virtualMachines", List.of("cpu", "memory"), 100));
     }
 
     @Test
-    public void testScrapeResources_resourceNotFound_error() {
-        AzureResource resource = new AzureResource("id", "type1", new HashMap<>());
-        when(resourceDiscoverer.getResourcesForType("type1")).thenReturn(Set.of(resource));
+    public void testScrapeResources_resourceNotFound_otherResourcesSuccessful() {
+        when(metricsClient.queryResourceMetrics(resourceWithId("vm2"), resourceTypeConfigWithType("virtualMachines"))).thenThrow(new RuntimeException("Resource not found!"));
         metricsScraper.scrapeAllResources();
-        //TODO - what should happen when resource not found (e.g. it has been deleted)
+        CollectorRegistry.defaultRegistry.getSampleValue("a"); //TODO
+    }
+
+    private ResourceTypeConfig resourceTypeConfigWithType( String resourceType) {
+        return argThat(conf -> conf != null && conf.resourceType() == resourceType);
+    }
+
+    private AzureResource resourceWithId(String id) {
+        return argThat(resource -> resource != null && resource.getId().equals(id));
     }
 
     @Test

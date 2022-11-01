@@ -1,6 +1,8 @@
 package com.tomw.azureexporter;
 
 
+import io.prometheus.client.CollectorRegistry;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
@@ -22,6 +24,11 @@ public class PrometheusScrapeEndpointIntegrationTests {
     @Autowired
     private MockMvc mockMvc;
 
+    @BeforeEach
+    public void setup(){
+        CollectorRegistry.defaultRegistry.clear();
+    }
+
     @Test
     public void testScrapeEndpoint_noParameters_ok() throws Exception {
         mockMvc.perform(get(ACTUATOR_PROMETHEUS_ENDPOINT)).andExpect(status().isOk());
@@ -30,7 +37,7 @@ public class PrometheusScrapeEndpointIntegrationTests {
     @Test
     public void testScrapeEndpoint_noParameters_metricsReturned() throws Exception {
         MvcResult result = mockMvc.perform(get(ACTUATOR_PROMETHEUS_ENDPOINT)).andReturn();
-        assertTrue(result.getResponse().getContentAsString().contains("cpu_usage"));
+        assertTrue(result.getResponse().getContentAsString().contains("TYPE"));
     }
 
     @Test
