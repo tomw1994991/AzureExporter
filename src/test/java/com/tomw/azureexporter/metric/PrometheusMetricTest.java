@@ -39,7 +39,7 @@ class PrometheusMetricTest {
 
     @Test
     public void testHasData_dataWithValue_returnsTrue() {
-        metricResult = MetricResultGenerator.resultWithDataAndValues();
+        metricResult = MetricResultGenerator.resultWithSingleDataPointWithValue();
         promMetric = new PrometheusMetric(resource, metricResult);
         assertTrue(promMetric.hasData());
     }

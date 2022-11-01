@@ -8,7 +8,6 @@ import io.prometheus.client.CollectorRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -36,13 +35,13 @@ public class AzureMetricsScraperTest {
     }
 
     private List<PrometheusMetric> populatedMetrics(AzureResource resource) {
-        //TODO return List.of(new PrometheusMetric(resource, new MetricResult()));
-        return new ArrayList<>();
+        return List.of(new PrometheusMetric(resource, MetricResultGenerator.resultWithSingleDataPointWithValue()));
     }
 
     private ScrapeConfigProps setupScrapeConfigProps() {
         ScrapeConfigProps props =  new ScrapeConfigProps();
         props.setResourceTypeConfigs(defaultResourceTypeConfigs());
+        props.setInitialDelayMillis(999999999);
         return props;
     }
 
@@ -72,6 +71,10 @@ public class AzureMetricsScraperTest {
 
     @Test
     public void testScrapeResource_resourceHasMetrics_metricsReturned() {
+    }
+
+    @Test
+    public void testScrapeResource_resourceHasMetricsWithMultipleDatapoints_metricsReturned() {
     }
 
     @Test

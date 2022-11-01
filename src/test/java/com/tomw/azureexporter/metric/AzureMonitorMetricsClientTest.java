@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-//TODO - generator / data provider for metric values
 public class AzureMonitorMetricsClientTest {
 
     private AzureMonitorMetricsClient metricsClient;
@@ -63,7 +62,7 @@ public class AzureMonitorMetricsClientTest {
     }
 
     private List<MetricResult> metricValuesWithData() {
-        return List.of(MetricResultGenerator.resultWithDataAndValues());
+        return List.of(MetricResultGenerator.resultWithSingleDataPointWithValue());
     }
 
 

@@ -34,7 +34,7 @@ public class AzureMonitorMetricsClient {
                 .credential(new DefaultAzureCredentialBuilder().build())
                 .buildClient();
     }
-
+    
     public List<PrometheusMetric> queryResourceMetrics(@NotNull AzureResource resource, @NotNull ResourceTypeConfig config) {
         MetricsQueryOptions queryOptions = getQueryOptions(config);
         Response<MetricsQueryResult> metricsResponse = queryClient

@@ -28,7 +28,7 @@ public abstract class MetricResultGenerator {
       return resultFromSingleTimeSeries(timeSeriesWithMetricValue(metricValue));
     }
 
-    public static MetricResult resultWithDataAndValues() {
+    public static MetricResult resultWithSingleDataPointWithValue() {
         MetricValue metricValue = new MetricValue(OffsetDateTime.now(), 10d, null, null, null, null);
         return resultFromSingleTimeSeries(timeSeriesWithMetricValue(metricValue));
     }
@@ -47,10 +47,5 @@ public abstract class MetricResultGenerator {
 
     private static MetricResult resultFromTimeSeriesList(final List<TimeSeriesElement> timeSeries) {
         return new MetricResult(DEFAULT_RESOURCE.getId(), DEFAULT_RESOURCE.getType(), null, "metric1", timeSeries, "desc1", null);
-    }
-
-
-    private MetricValue metricValueWithData() {
-        return new MetricValue(OffsetDateTime.now(), 1d, 2d, 3d, 4d, 5d);
     }
 }
