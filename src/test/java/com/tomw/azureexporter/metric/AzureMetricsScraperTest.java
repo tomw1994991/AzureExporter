@@ -32,7 +32,7 @@ public class AzureMetricsScraperTest {
         AzureResource resource1 = new AzureResource("vm1", "virtualMachines", new HashMap<>());
         AzureResource resource2 = new AzureResource("vm2", "virtualMachines", new HashMap<>());
         when(metricsClient.queryResourceMetrics(resourceWithId(resource1.getId()), resourceTypeConfigWithType(resource1.getType()))).thenReturn(populatedMetrics(resource1));
-        when(resourceDiscoverer.getResourcesForType("virtualMachines")).thenReturn(Set.of(resource1, resource2));
+        when(resourceDiscoverer.getResourcesForType(resource1.getType())).thenReturn(Set.of(resource1, resource2));
     }
 
     private List<PrometheusMetric> populatedMetrics(AzureResource resource) {

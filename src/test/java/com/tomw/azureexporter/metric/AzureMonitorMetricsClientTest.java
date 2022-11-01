@@ -17,7 +17,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.Duration;
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,20 +59,14 @@ public class AzureMonitorMetricsClientTest {
 
 
     private List<MetricResult> defaultMetricValues() {
-        return List.of(new MetricResult("id1", "resource1", MetricUnit.BYTES, "metric1", new ArrayList<TimeSeriesElement>(), "desc1", null));
+        return List.of(MetricResultGenerator.resultWithNoData());
     }
 
     private List<MetricResult> metricValuesWithData() {
-        return List.of(new MetricResult("id1", "resource1", MetricUnit.BYTES, "metric1", getTimeSeriesListWithData(), "desc1", null));
+        return List.of(MetricResultGenerator.resultWithDataAndValues());
     }
 
-    private List<TimeSeriesElement> getTimeSeriesListWithData() {
-        return List.of(new TimeSeriesElement(List.of(metricValueWithData()), null));
-    }
 
-    private MetricValue metricValueWithData() {
-        return new MetricValue(OffsetDateTime.now(), 1d, null, null, null, null);
-    }
 
     private MetricsQueryResult createMetricsQueryResult(List<MetricResult> metrics) {
         return new MetricsQueryResult(1, QueryTimeInterval.LAST_5_MINUTES, Duration.ofMinutes(5), "namespace1", "uksouth", metrics);
@@ -102,7 +95,7 @@ public class AzureMonitorMetricsClientTest {
         List<PrometheusMetric> metrics = metricsClient.queryResourceMetrics(resource,  config);
         assertEquals(1, metrics.size());
         assertTrue(metrics.get(0).hasData());
-        assertEquals(1d, metrics.get(0).getDataPoints().get(0).value);
+        assertEquals(10d, metrics.get(0).getDataPoints().get(0).value);
     }
 
     @Test
