@@ -22,7 +22,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-registry-prometheus'
 
-    implementation platform('com.azure:azure-sdk-bom:1.2.7')
+    implementation platform('com.azure:azure-sdk-bom:1.2.8')
     implementation 'com.azure.resourcemanager:azure-resourcemanager-resourcegraph:1.0.0'
     implementation 'com.azure:azure-monitor-query'
     implementation 'com.azure:azure-identity'
