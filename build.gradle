@@ -26,7 +26,7 @@ dependencies {
     implementation 'com.azure.resourcemanager:azure-resourcemanager-resourcegraph:1.0.0'
     implementation 'com.azure:azure-monitor-query'
     implementation 'com.azure:azure-identity'
-    implementation 'org.jetbrains:annotations:23.0.0'
+    implementation 'org.jetbrains:annotations:23.1.0'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
