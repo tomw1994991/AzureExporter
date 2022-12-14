@@ -18,38 +18,31 @@ public class MetricExporter extends Collector {
     private long metricDataExpirationMillis = 600000;
 
     @Synchronized
-    public static MetricExporter forMetric(PrometheusMetric metric){
-        MetricExporter exporter = exporters.get(metric.getName());
-        if(null == exporter){
-            log.info("Creating new exporter for metric {}", metric.getName());
-            exporter = new MetricExporter(metric);
-        }
+    public static MetricExporter forMetric(PrometheusMetric metric) {
+        MetricExporter exporter = exporters.getOrDefault(metric.getName(), new MetricExporter(metric));
         exporters.putIfAbsent(metric.getName(), exporter);
         return exporter;
     }
 
-    private MetricExporter(PrometheusMetric metric){
+    private MetricExporter(PrometheusMetric metric) {
         metricData = createMetricFamily(metric);
         this.register();
+        log.info("Created new exporter for metric {}", metric.getName());
     }
 
     @Override
     public List<MetricFamilySamples> collect() {
-        if (log.isDebugEnabled()){
-            log.debug("Collected metric values for export: {}", metricData);
-        }
+        log.debug("Collected metric values for export: {}", metricData);
         return List.of(metricData);
     }
 
     public void saveMetric(PrometheusMetric metric) {
         removeExpiredData(metricData.samples);
         addNewData(metricData.samples, metric);
-        if (log.isDebugEnabled()){
-            log.debug("Saved metric data: {}", metricData.samples);
-        }
+        log.debug("Saved metric data: {}", metricData.samples);
     }
 
-    public MetricExporter withRetention(long metricDataExpirationMillis){
+    public MetricExporter withRetention(long metricDataExpirationMillis) {
         this.metricDataExpirationMillis = metricDataExpirationMillis;
         return this;
     }
