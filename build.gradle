@@ -6,6 +6,7 @@ plugins {
     id 'java'
 }
 
+jib.to.image='tomw1994991/azure-exporter'
 group = 'com.tomw'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
