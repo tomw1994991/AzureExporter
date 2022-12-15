@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -30,10 +31,8 @@ public class AzureMetricsScraper {
     public void scrapeAllResources() {
         executor = Objects.requireNonNullElse(executor, Executors.newFixedThreadPool(scrapeConfig.getThreads()));
         log.info("Scraping Azure resources for metrics.");
-        scrapeConfig.getResourceTypeConfigs().forEach(resourceType -> {
-            Runnable task = () -> scrapeResourceType(resourceType);
-            executor.execute(task);
-        });
+        List<CompletableFuture<Void>> futures = scrapeConfig.getResourceTypeConfigs().stream().map(resourceType -> CompletableFuture.runAsync(() -> scrapeResourceType(resourceType), executor)).toList();
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture<?>[0])).join();
     }
 
     private void scrapeResourceType(ResourceTypeConfig resourceType) {
