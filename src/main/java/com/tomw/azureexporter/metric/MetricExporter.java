@@ -6,20 +6,23 @@ import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class MetricExporter extends Collector {
 
     private final MetricFamilySamples metricData;
-    private final static Map<String, MetricExporter> exporters = new HashMap<>();
+    private final static Map<String, MetricExporter> exporters = new ConcurrentHashMap<>();
     private long metricDataExpirationMillis = 600000;
 
     @Synchronized
     public static MetricExporter forMetric(PrometheusMetric metric) {
-        MetricExporter exporter = exporters.getOrDefault(metric.getName(), new MetricExporter(metric));
+        MetricExporter exporter = exporters.get(metric.getName());
+        if(null == exporter){
+            exporter = new MetricExporter(metric);
+        }
         exporters.putIfAbsent(metric.getName(), exporter);
         return exporter;
     }

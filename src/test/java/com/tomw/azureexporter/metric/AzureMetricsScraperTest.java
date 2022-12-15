@@ -4,17 +4,19 @@ import com.tomw.azureexporter.config.ResourceTypeConfig;
 import com.tomw.azureexporter.config.ScrapeConfigProps;
 import com.tomw.azureexporter.resource.AzureResource;
 import com.tomw.azureexporter.resource.ResourceDiscoverer;
+import io.prometheus.client.Collector;
 import io.prometheus.client.CollectorRegistry;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class AzureMetricsScraperTest {
 
@@ -26,16 +28,31 @@ public class AzureMetricsScraperTest {
 
     AzureMetricsScraper metricsScraper = new AzureMetricsScraper(config, resourceDiscoverer, metricsClient);
 
+    AzureResource resource1 = new AzureResource("vm1", "virtualMachines", new HashMap<>());
+    AzureResource resource2 = new AzureResource("vm2", "virtualMachines", new HashMap<>());
+    AzureResource resource3 = new AzureResource("database1", "database", new HashMap<>());
+
+
     @BeforeEach
     public void setup() {
-        AzureResource resource1 = new AzureResource("vm1", "virtualMachines", new HashMap<>());
-        AzureResource resource2 = new AzureResource("vm2", "virtualMachines", new HashMap<>());
-        when(metricsClient.queryResourceMetrics(resourceWithId(resource1.getId()), resourceTypeConfigWithType(resource1.getType()))).thenReturn(populatedMetrics(resource1));
+        CollectorRegistry.defaultRegistry.clear();
+        Mockito.reset(metricsClient);
+        Mockito.reset(resourceDiscoverer);
         when(resourceDiscoverer.getResourcesForType(resource1.getType())).thenReturn(Set.of(resource1, resource2));
+        when(resourceDiscoverer.getResourcesForType("database1")).thenReturn(Set.of(resource3));
     }
 
-    private List<PrometheusMetric> populatedMetrics(AzureResource resource) {
-        return List.of(new PrometheusMetric(resource, MetricResultGenerator.resultWithSingleDataPointWithValue()));
+    private List<PrometheusMetric> metricWithSingleDatapoint(AzureResource resource, String metricName) {
+        return List.of(new PrometheusMetric(resource, MetricResultGenerator.resultWithSingleDataPointWithValue(metricName)));
+    }
+
+    private List<PrometheusMetric> metricWithMultipleDatapoints(AzureResource resource, String metricName) {
+        return List.of(new PrometheusMetric(resource, MetricResultGenerator.resultWithMultipleDataPointsWithValue(metricName)));
+    }
+
+
+    private List<PrometheusMetric> emptyMetrics(){
+        return new ArrayList<>();
     }
 
     private ScrapeConfigProps setupScrapeConfigProps() {
@@ -46,14 +63,28 @@ public class AzureMetricsScraperTest {
     }
 
     private List<ResourceTypeConfig> defaultResourceTypeConfigs() {
-        return List.of(new ResourceTypeConfig("virtualMachines", List.of("cpu", "memory"), 100));
+        return List.of(new ResourceTypeConfig("virtualMachines", List.of("metric2", "metric3", "metric1"), 100));
+    }
+
+    @NotNull
+    private static List<Collector.MetricFamilySamples.Sample> getMetricSamplesFromDefaultRegistry(Set<String> metricNames) {
+        List<Collector.MetricFamilySamples.Sample> metricSamples = new ArrayList<>();
+        Iterator<Collector.MetricFamilySamples> iterator = CollectorRegistry.defaultRegistry.filteredMetricFamilySamples(metricNames).asIterator();
+        iterator.forEachRemaining(samples -> metricSamples.addAll(samples.samples));
+        return metricSamples;
     }
 
     @Test
     public void testScrapeResources_resourceNotFound_otherResourcesSuccessful() {
-        when(metricsClient.queryResourceMetrics(resourceWithId("vm2"), resourceTypeConfigWithType("virtualMachines"))).thenThrow(new RuntimeException("Resource not found!"));
+        when(metricsClient.queryResourceMetrics(resourceWithId(resource2.getId()), resourceTypeConfigWithType(resource2.getType()))).thenThrow(new RuntimeException("Resource not found!"));
+        when(metricsClient.queryResourceMetrics(resourceWithId(resource1.getId()), resourceTypeConfigWithType(resource1.getType()))).thenReturn(metricWithSingleDatapoint(resource1, "metric_3"));
         metricsScraper.scrapeAllResources();
-        CollectorRegistry.defaultRegistry.getSampleValue("a"); //TODO
+        Double testVal = CollectorRegistry.defaultRegistry.getSampleValue("azure_virtualmachines_metric_3", new String[]{"id"}, new String[]{"vm1"});
+        assertEquals(10.0, testVal);
+    }
+
+    private ResourceTypeConfig resourceTypeConfigWithMetrics(int numberOfMetrics) {
+        return argThat(conf -> conf != null && conf.metrics().size() == numberOfMetrics);
     }
 
     private ResourceTypeConfig resourceTypeConfigWithType( String resourceType) {
@@ -65,23 +96,41 @@ public class AzureMetricsScraperTest {
     }
 
     @Test
-    public void testScrapeResource_resourceHasNoMetrics_success() {
-
+    public void testScrapeResource_resourceHasNoMetrics_noErrors() {
+        when(metricsClient.queryResourceMetrics(any(), any())).thenReturn(emptyMetrics());
+        metricsScraper.scrapeAllResources();
     }
 
     @Test
-    public void testScrapeResource_resourceHasMetrics_metricsReturned() {
+    public void testScrapeResource_resourceHasMetricsWithMultipleDatapoints_allRetrieved() {
+        when(metricsClient.queryResourceMetrics(resourceWithId(resource2.getId()), resourceTypeConfigWithType(resource2.getType()))).thenReturn(metricWithMultipleDatapoints(resource2, "metric4"));
+        metricsScraper.scrapeAllResources();
+        List<Collector.MetricFamilySamples.Sample> metricSamples = getMetricSamplesFromDefaultRegistry(Set.of("azure_virtualmachines_metric4"));
+        assertEquals(3, metricSamples.stream().filter(sample -> sample.labelValues.contains("vm2")).count());
     }
 
     @Test
-    public void testScrapeResource_resourceHasMetricsWithMultipleDatapoints_metricsReturned() {
+    public void testScrapeResourcesForType_noResources_noError() {
+        when(resourceDiscoverer.getResourcesForType(any())).thenReturn(new HashSet<>());
+        metricsScraper.scrapeAllResources();
     }
 
     @Test
-    public void testScrapeResourcesForType_happyPath() {
+    public void testScrapeResources_multipleMetrics_allRetrieved() {
+        List<PrometheusMetric> mixedMetrics = new ArrayList<>();
+        mixedMetrics.addAll(metricWithMultipleDatapoints(resource2, "metric6"));
+        mixedMetrics.addAll(metricWithMultipleDatapoints(resource2, "metric7"));
+        when(metricsClient.queryResourceMetrics(resourceWithId(resource2.getId()), resourceTypeConfigWithType(resource2.getType()))).thenReturn(mixedMetrics);
+        metricsScraper.scrapeAllResources();
+        List<Collector.MetricFamilySamples.Sample> metricSamples = getMetricSamplesFromDefaultRegistry(Set.of("azure_virtualmachines_metric6", "azure_virtualmachines_metric7"));
+        assertEquals(6, metricSamples.stream().filter(sample -> sample.labelValues.contains("vm2")).count());
     }
 
     @Test
-    public void testScrapeResourcesForType_noResources_success() {
+    public void testScrapeResources_onlyConfiguredMetricsRequested(){
+        metricsScraper.scrapeAllResources();
+        verify(metricsClient, times(1)).queryResourceMetrics(resourceWithId("vm2"), resourceTypeConfigWithMetrics(3));
+        verify(metricsClient, times(1)).queryResourceMetrics(resourceWithId("vm1"), resourceTypeConfigWithMetrics(3));
+        verify(metricsClient, times(0)).queryResourceMetrics(resourceWithId("database1"), any());
     }
 }
