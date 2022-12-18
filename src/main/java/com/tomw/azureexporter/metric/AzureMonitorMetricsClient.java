@@ -12,6 +12,7 @@ import com.azure.monitor.query.models.QueryTimeInterval;
 import com.tomw.azureexporter.config.ResourceTypeConfig;
 import com.tomw.azureexporter.config.ScrapeConfigProps;
 import com.tomw.azureexporter.resource.AzureResource;
+import io.prometheus.client.Counter;
 import lombok.AccessLevel;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +28,7 @@ public class AzureMonitorMetricsClient {
     private final ScrapeConfigProps scrapeConfig;
     @Setter(AccessLevel.PACKAGE)
     private MetricsQueryClient queryClient;
+    private static final Counter azureMetricApiCalls = Counter.build().name("azure_monitor_metric_api_calls").help("Number of calls to the azure monitor api for metrics.").labelNames("metric").register();
 
     public AzureMonitorMetricsClient(@NotNull ScrapeConfigProps scrapeConfig) {
         this.scrapeConfig = scrapeConfig;
@@ -40,7 +42,12 @@ public class AzureMonitorMetricsClient {
         Response<MetricsQueryResult> metricsResponse = queryClient
                 .queryResourceWithResponse(resource.getId(), config.metrics(),
                         setMetricsQueryInterval(queryOptions, scrapeConfig.getQueryWindowInMillis()), Context.NONE);
+        incrementApiCallMetric(config.metrics());
         return getPrometheusMetrics(resource, metricsResponse );
+    }
+
+    private void incrementApiCallMetric(List<String> metrics) {
+        metrics.forEach(metric -> azureMetricApiCalls.labels(metric).inc());
     }
 
     private MetricsQueryOptions getQueryOptions(ResourceTypeConfig config){
