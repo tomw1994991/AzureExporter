@@ -42,12 +42,12 @@ public class AzureMonitorMetricsClient {
         Response<MetricsQueryResult> metricsResponse = queryClient
                 .queryResourceWithResponse(resource.getId(), config.metrics(),
                         setMetricsQueryInterval(queryOptions, scrapeConfig.getQueryWindowInMillis()), Context.NONE);
-        incrementApiCallMetric(config.metrics());
+        incrementApiCallMetric(resource.getType(), config.metrics());
         return getPrometheusMetrics(resource, metricsResponse );
     }
 
-    private void incrementApiCallMetric(List<String> metrics) {
-        metrics.forEach(metric -> azureMetricApiCalls.labels(metric).inc());
+    private void incrementApiCallMetric(String resourceType, List<String> metrics) {
+        metrics.forEach(metric -> azureMetricApiCalls.labels(resourceType + "_" + metric).inc());
     }
 
     private MetricsQueryOptions getQueryOptions(ResourceTypeConfig config){

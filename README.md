@@ -22,6 +22,10 @@
 | microsoft.category/resourceType    metricName      | azure_resourcetype_metricname_units       |
 | microsoft.category/CASEINSENSITIVE   special-chars | azure_caseinsensitive_special_chars_units |
 
+### Special Metrics
+
+azure_monitor_metric_api_calls_total (counter) records the number of calls to the azure metrics api for cost tracking.
+
 ### Docker
 
 - Using jib to produce docker image: https://github.com/GoogleContainerTools/jib/tree/master/jib-gradle-plugin
