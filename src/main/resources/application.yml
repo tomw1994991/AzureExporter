@@ -77,3 +77,10 @@ scrape:
         - "HealthyHostCount"
         - "UnhealthyHostCount"
         - "Throughput"
+    - resourceType: "Microsoft.Compute/disks"
+      granularity-in-mins: 5
+      metrics:
+        - "Compose Disk Write Bytes/sec"
+        - "Compose Disk Read Bytes/sec"
+        - "DiskPaidBurstIOPS"
+
