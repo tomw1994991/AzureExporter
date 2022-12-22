@@ -25,6 +25,10 @@ scrape:
       metrics:
         - "Ingress"
         - "Availability"
+        - "SuccessE2ELatency"
+        - "Egress"
+        - "Ingress"
+        - "Transactions"
     - resourceType: "Microsoft.Storage/storageAccounts"
       granularity-in-mins: 60
       metrics:
@@ -54,3 +58,22 @@ scrape:
       metrics:
         - "IfUnderDDoSAttack"
         - "PingMeshAverageRoundtripMs"
+    - resourceType: "Microsoft.Network/applicationGateways"
+      granularity-in-mins: 5
+      metrics:
+        - "AzwafTotalRequests"
+        - "BackendLastByteResponseTime"
+        - "BackendFirstByteResponseTime"
+        - "BackendConnectTime"
+        - "ApplicationGatewayTotalTime"
+        - "BytesReceived"
+        - "BytesSent"
+        - "BackendResponseStatus"
+        - "ResponseStatus"
+        - "NewConnectionsPerSecond"
+        - "CurrentConnections"
+        - "FailedRequests"
+        - "TotalRequests"
+        - "HealthyHostCount"
+        - "UnhealthyHostCount"
+        - "Throughput"
