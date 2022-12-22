@@ -33,7 +33,24 @@ scrape:
       granularity-in-mins: 5
       metrics:
         - "CPU"
+        - "VmAvailabilityMetric"
+        - "Available Memory Bytes"
+        - "Percentage CPU"
+        - "Network Out Total"
+        - "Network In Total"
+        - "OS Disk Bandwidth Consumed Percentage"
+        - "Data Disk Max Burst Bandwidth"
+        - "Data Disk IOPS Consumed Percentage"
+        - "Data Disk Bandwidth Consumed Percentage"
+        - "Data Disk Write Bytes/Sec"
+        - "Data Disk Read Bytes/Sec"
+        - "CPU Credits Remaining"
+        - "Disk Write Bytes"
+        - "Disk Read Bytes"
+        - "Network Out"
+        - "Network In"
     - resourceType: "Microsoft.Network/virtualNetworks"
       granularity-in-mins: 5
       metrics:
         - "IfUnderDDoSAttack"
+        - "PingMeshAverageRoundtripMs"

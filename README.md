@@ -11,8 +11,10 @@
 
 - For YML configuration, resource types are case insensitive. Metric names should be written exactly how Azure uses
   them.
+- Can use the azure cli to list potential metric definitions https://learn.microsoft.com/en-us/cli/azure/monitor/metrics?view=azure-cli-latest#az-monitor-metrics-list-definitions
 - The exposed metrics for prometheus will be prefixed with 'azure_resourcetype_' and converted into an appropriate
   format: https://prometheus.io/docs/practices/naming/
+- supports SCCS 
 
 ### Example Metrics
 
