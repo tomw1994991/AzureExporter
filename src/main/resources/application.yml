@@ -83,4 +83,12 @@ scrape:
         - "Compose Disk Write Bytes/sec"
         - "Compose Disk Read Bytes/sec"
         - "DiskPaidBurstIOPS"
+    - resourceType: "Microsoft.ContainerRegistry/registries"
+      granularity-in-mins: 5
+      metrics:
+        - "StorageUsed"
+        - "SuccessfulPushCount"
+        - "TotalPushCount"
+        - "SuccessfulPullCount"
+        - "TotalPullCount"
 
