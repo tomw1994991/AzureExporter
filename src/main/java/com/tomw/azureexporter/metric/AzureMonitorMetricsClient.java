@@ -20,7 +20,10 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Component
 public class AzureMonitorMetricsClient {
@@ -39,11 +42,16 @@ public class AzureMonitorMetricsClient {
     
     public List<PrometheusMetric> queryResourceMetrics(@NotNull AzureResource resource, @NotNull ResourceTypeConfig config) {
         MetricsQueryOptions queryOptions = getQueryOptions(config);
+        return splitToMaxSizeChunks(config.metrics(), 20).stream().
+                map( chunk -> queryAzureMonitorForMetrics(resource, config, queryOptions)).flatMap(Collection::stream).toList();
+    }
+
+    private List<PrometheusMetric> queryAzureMonitorForMetrics(@NotNull AzureResource resource, @NotNull ResourceTypeConfig config, MetricsQueryOptions queryOptions) {
         Response<MetricsQueryResult> metricsResponse = queryClient
                 .queryResourceWithResponse(resource.getId(), config.metrics(),
                         setMetricsQueryInterval(queryOptions, scrapeConfig.getQueryWindowInMillis()), Context.NONE);
         incrementApiCallMetric(resource.getType(), config.metrics());
-        return getPrometheusMetrics(resource, metricsResponse );
+        return getPrometheusMetrics(resource, metricsResponse);
     }
 
     private void incrementApiCallMetric(String resourceType, List<String> metrics) {
@@ -70,5 +78,10 @@ public class AzureMonitorMetricsClient {
     /* package */ MetricsQueryOptions setMetricsQueryInterval(MetricsQueryOptions options, int intervalInMillis) {
         options.setTimeInterval(QueryTimeInterval.parse(Duration.ofMillis(intervalInMillis).toString()));
         return options;
+    }
+
+    public static <T> Collection<List<T>> splitToMaxSizeChunks(List<T> inputList, int chunkSize) {
+        AtomicInteger counter = new AtomicInteger();
+        return inputList.stream().collect(Collectors.groupingBy(it -> counter.getAndIncrement() / chunkSize)).values();
     }
 }

@@ -14,9 +14,7 @@ import com.azure.monitor.query.models.QueryTimeInterval;
 import com.tomw.azureexporter.config.ResourceTypeConfig;
 import com.tomw.azureexporter.config.ScrapeConfigProps;
 import com.tomw.azureexporter.resource.AzureResource;
-import io.prometheus.client.CollectorRegistry;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -106,6 +104,14 @@ public class AzureMonitorMetricsClientTest {
     public void testQueryResourceMetrics_correctArgumentsPassedToClient(){
         metricsClient.queryResourceMetrics(resource,  config);
         verify(mockQueryClient, times(1)).queryResourceWithResponse(eq(resource.getId()), eq(List.of("metric1")), any(), eq(Context.NONE));
+    }
+
+    @Test
+    public void testQueryResourceMetrics_moreThan20Metrics_multipleRequestsSent(){
+        ResourceTypeConfig configWithManyMetrics = new ResourceTypeConfig("type1", List.of("metric1", "metric2", "metric3", "metric4", "metric5", "metric6", "metric7", "metric8", "metric9", "metric10",
+                "metric11", "metric12", "metric13", "metric14", "metric15", "metric16", "metric17", "metric18", "metric19", "metric20", "metric21", "metric22", "metric23", "metric24", "metric25"), 1);
+        metricsClient.queryResourceMetrics(resource,  configWithManyMetrics);
+        verify(mockQueryClient, times(2)).queryResourceWithResponse(eq(resource.getId()), any(), any(), eq(Context.NONE));
     }
 
     @ParameterizedTest
