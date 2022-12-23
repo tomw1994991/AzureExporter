@@ -36,7 +36,7 @@ scrape:
     - resourceType: "Microsoft.Compute/VirtualMachines"
       granularity-in-mins: 5
       metrics:
-        - "CPU"
+        - "Percentage CPU"
         - "VmAvailabilityMetric"
         - "Available Memory Bytes"
         - "Percentage CPU"
