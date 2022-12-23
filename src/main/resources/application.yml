@@ -86,11 +86,14 @@ scrape:
     - resourceType: "Microsoft.ContainerRegistry/registries"
       granularity-in-mins: 5
       metrics:
-        - "StorageUsed"
         - "SuccessfulPushCount"
         - "TotalPushCount"
         - "SuccessfulPullCount"
         - "TotalPullCount"
+    - resourceType: "Microsoft.ContainerRegistry/registries"
+      granularity-in-mins: 60
+      metrics:
+        - "StorageUsed"
     - resourceType: "Microsoft.DBforMySQL/flexibleServers"
       granularity-in-mins: 5
       metrics:
