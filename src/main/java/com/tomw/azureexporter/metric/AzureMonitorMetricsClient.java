@@ -43,7 +43,8 @@ public class AzureMonitorMetricsClient {
     public List<PrometheusMetric> retrieveResourceMetrics(@NotNull AzureResource resource, @NotNull ResourceTypeConfig config) {
         MetricsQueryOptions queryOptions = getQueryOptions(config);
         return splitToMaxSizeChunks(config.metrics(), 20).stream().
-                map( chunk -> queryAzureMonitorForMetrics(resource, config, queryOptions)).flatMap(Collection::stream).toList();
+                map( chunk -> queryAzureMonitorForMetrics(resource, new ResourceTypeConfig(config.resourceType(), chunk, config.granularityInMins()), queryOptions))
+                .flatMap(Collection::stream).toList();
     }
 
     private List<PrometheusMetric> queryAzureMonitorForMetrics(@NotNull AzureResource resource, @NotNull ResourceTypeConfig config, MetricsQueryOptions queryOptions) {
