@@ -57,7 +57,7 @@ public class AzureMetricsScraper {
         List<PrometheusMetric> metrics = new ArrayList<>();
         try {
             log.debug("[{}] Retrieving metrics for resource: {}", currentThread().getName(), resource.getId());
-            metrics = metricsClient.queryResourceMetrics(resource, resourceType);
+            metrics = metricsClient.retrieveResourceMetrics(resource, resourceType);
             log.debug("[{}] Retrieved {} metric results for resource: {}", currentThread().getName(), metrics.size(), resource.getId());
         } catch (RuntimeException ex) {
             log.error("Unexpected error retrieving metrics for resource {}", resource, ex);

@@ -40,7 +40,7 @@ public class AzureMonitorMetricsClient {
                 .buildClient();
     }
     
-    public List<PrometheusMetric> queryResourceMetrics(@NotNull AzureResource resource, @NotNull ResourceTypeConfig config) {
+    public List<PrometheusMetric> retrieveResourceMetrics(@NotNull AzureResource resource, @NotNull ResourceTypeConfig config) {
         MetricsQueryOptions queryOptions = getQueryOptions(config);
         return splitToMaxSizeChunks(config.metrics(), 20).stream().
                 map( chunk -> queryAzureMonitorForMetrics(resource, config, queryOptions)).flatMap(Collection::stream).toList();

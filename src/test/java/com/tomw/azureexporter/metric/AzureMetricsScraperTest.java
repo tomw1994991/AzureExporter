@@ -76,8 +76,8 @@ public class AzureMetricsScraperTest {
 
     @Test
     public void testScrapeResources_resourceNotFound_otherResourcesSuccessful() {
-        when(metricsClient.queryResourceMetrics(resourceWithId(resource2.getId()), resourceTypeConfigWithType(resource2.getType()))).thenThrow(new RuntimeException("Resource not found!"));
-        when(metricsClient.queryResourceMetrics(resourceWithId(resource1.getId()), resourceTypeConfigWithType(resource1.getType()))).thenReturn(metricWithSingleDatapoint(resource1, "metric_3"));
+        when(metricsClient.retrieveResourceMetrics(resourceWithId(resource2.getId()), resourceTypeConfigWithType(resource2.getType()))).thenThrow(new RuntimeException("Resource not found!"));
+        when(metricsClient.retrieveResourceMetrics(resourceWithId(resource1.getId()), resourceTypeConfigWithType(resource1.getType()))).thenReturn(metricWithSingleDatapoint(resource1, "metric_3"));
         metricsScraper.scrapeAllResources();
         Double testVal = CollectorRegistry.defaultRegistry.getSampleValue("azure_virtualmachines_metric_3", new String[]{"id"}, new String[]{"vm1"});
         assertEquals(10.0, testVal);
@@ -97,13 +97,13 @@ public class AzureMetricsScraperTest {
 
     @Test
     public void testScrapeResource_resourceHasNoMetrics_noErrors() {
-        when(metricsClient.queryResourceMetrics(any(), any())).thenReturn(emptyMetrics());
+        when(metricsClient.retrieveResourceMetrics(any(), any())).thenReturn(emptyMetrics());
         metricsScraper.scrapeAllResources();
     }
 
     @Test
     public void testScrapeResource_resourceHasMetricsWithMultipleDatapoints_allRetrieved() {
-        when(metricsClient.queryResourceMetrics(resourceWithId(resource2.getId()), resourceTypeConfigWithType(resource2.getType()))).thenReturn(metricWithMultipleDatapoints(resource2, "metric4"));
+        when(metricsClient.retrieveResourceMetrics(resourceWithId(resource2.getId()), resourceTypeConfigWithType(resource2.getType()))).thenReturn(metricWithMultipleDatapoints(resource2, "metric4"));
         metricsScraper.scrapeAllResources();
         List<Collector.MetricFamilySamples.Sample> metricSamples = getMetricSamplesFromDefaultRegistry(Set.of("azure_virtualmachines_metric4"));
         assertEquals(3, metricSamples.stream().filter(sample -> sample.labelValues.contains("vm2")).count());
@@ -120,7 +120,7 @@ public class AzureMetricsScraperTest {
         List<PrometheusMetric> mixedMetrics = new ArrayList<>();
         mixedMetrics.addAll(metricWithMultipleDatapoints(resource2, "metric6"));
         mixedMetrics.addAll(metricWithMultipleDatapoints(resource2, "metric7"));
-        when(metricsClient.queryResourceMetrics(resourceWithId(resource2.getId()), resourceTypeConfigWithType(resource2.getType()))).thenReturn(mixedMetrics);
+        when(metricsClient.retrieveResourceMetrics(resourceWithId(resource2.getId()), resourceTypeConfigWithType(resource2.getType()))).thenReturn(mixedMetrics);
         metricsScraper.scrapeAllResources();
         List<Collector.MetricFamilySamples.Sample> metricSamples = getMetricSamplesFromDefaultRegistry(Set.of("azure_virtualmachines_metric6", "azure_virtualmachines_metric7"));
         assertEquals(6, metricSamples.stream().filter(sample -> sample.labelValues.contains("vm2")).count());
@@ -129,8 +129,8 @@ public class AzureMetricsScraperTest {
     @Test
     public void testScrapeResources_onlyConfiguredMetricsRequested(){
         metricsScraper.scrapeAllResources();
-        verify(metricsClient, times(1)).queryResourceMetrics(resourceWithId("vm2"), resourceTypeConfigWithMetrics(3));
-        verify(metricsClient, times(1)).queryResourceMetrics(resourceWithId("vm1"), resourceTypeConfigWithMetrics(3));
-        verify(metricsClient, times(0)).queryResourceMetrics(resourceWithId("database1"), any());
+        verify(metricsClient, times(1)).retrieveResourceMetrics(resourceWithId("vm2"), resourceTypeConfigWithMetrics(3));
+        verify(metricsClient, times(1)).retrieveResourceMetrics(resourceWithId("vm1"), resourceTypeConfigWithMetrics(3));
+        verify(metricsClient, times(0)).retrieveResourceMetrics(resourceWithId("database1"), any());
     }
 }

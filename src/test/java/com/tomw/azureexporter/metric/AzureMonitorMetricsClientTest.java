@@ -81,20 +81,20 @@ public class AzureMonitorMetricsClientTest {
     @Test
     public void testQueryResourceMetrics_noResults_noError(){
       when(mockQueryClient.queryResourceWithResponse(any(), any(), any(), any())).thenReturn(emptyResponse());
-      List<PrometheusMetric> metrics = metricsClient.queryResourceMetrics(resource,  config);
+      List<PrometheusMetric> metrics = metricsClient.retrieveResourceMetrics(resource,  config);
       assertEquals(0, metrics.size());
     }
 
     @Test
     public void testQueryResourceMetrics_hasResultsButNoData_noPrometheusMetrics(){
         when(mockQueryClient.queryResourceWithResponse(any(), any(), any(), any())).thenReturn(responseWithMetricsButNoData());
-        List<PrometheusMetric> metrics = metricsClient.queryResourceMetrics(resource,  config);
+        List<PrometheusMetric> metrics = metricsClient.retrieveResourceMetrics(resource,  config);
         assertEquals(0, metrics.size());
     }
 
     @Test
     public void testQueryResourceMetrics_hasResultsWithData_prometheusMetricsReturned(){
-        List<PrometheusMetric> metrics = metricsClient.queryResourceMetrics(resource,  config);
+        List<PrometheusMetric> metrics = metricsClient.retrieveResourceMetrics(resource,  config);
         assertEquals(1, metrics.size());
         assertTrue(metrics.get(0).hasData());
         assertEquals(10d, metrics.get(0).getDataPoints().get(0).value);
@@ -102,7 +102,7 @@ public class AzureMonitorMetricsClientTest {
 
     @Test
     public void testQueryResourceMetrics_correctArgumentsPassedToClient(){
-        metricsClient.queryResourceMetrics(resource,  config);
+        metricsClient.retrieveResourceMetrics(resource,  config);
         verify(mockQueryClient, times(1)).queryResourceWithResponse(eq(resource.getId()), eq(List.of("metric1")), any(), eq(Context.NONE));
     }
 
@@ -110,7 +110,7 @@ public class AzureMonitorMetricsClientTest {
     public void testQueryResourceMetrics_moreThan20Metrics_multipleRequestsSent(){
         ResourceTypeConfig configWithManyMetrics = new ResourceTypeConfig("type1", List.of("metric1", "metric2", "metric3", "metric4", "metric5", "metric6", "metric7", "metric8", "metric9", "metric10",
                 "metric11", "metric12", "metric13", "metric14", "metric15", "metric16", "metric17", "metric18", "metric19", "metric20", "metric21", "metric22", "metric23", "metric24", "metric25"), 1);
-        metricsClient.queryResourceMetrics(resource,  configWithManyMetrics);
+        metricsClient.retrieveResourceMetrics(resource,  configWithManyMetrics);
         verify(mockQueryClient, times(2)).queryResourceWithResponse(eq(resource.getId()), any(), any(), eq(Context.NONE));
     }
 
