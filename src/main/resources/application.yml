@@ -3,6 +3,9 @@ spring:
     name: azure-exporter
   config:
     import: "optional:configserver:"
+  cloud:
+    config:
+      uri:
 management:
   endpoints:
     web:
