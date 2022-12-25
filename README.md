@@ -34,3 +34,4 @@ azure_monitor_metric_api_calls_total (counter) records the number of calls to th
 - For a local image: ./gradlew jibDockerBuild
 - To build to ACR: ./gradlew jib -Djib.to.image='my_acr_name.azurecr.io/my-app'
 - Docker image on docker hub available as tomw1994991/azure-exporter https://hub.docker.com/r/tomw1994991/azure-exporter
+- If building behind a proxy, configure gradle proxy variables in ~/.gradle/gradle.properties https://stackoverflow.com/questions/5991194/gradle-proxy-configuration 
