@@ -14,6 +14,9 @@ management:
           - health
           - prometheus
 
+server:
+  port: 8090
+
 resource-discovery:
   interval-in-millis: 450000
   initial-delay-millis: 500

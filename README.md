@@ -6,6 +6,7 @@
 - ResourceDiscoverer component finds resources. MetricsScraper component talks to Azure monitor.
 - Actuator prometheus endpoint exposes metrics for prometheus.
 - Docs for writing exporters: https://prometheus.io/docs/instrumenting/writing_exporters/
+- Metrics are at localhost:8090/actuator/prometheus by default
 
 ## Configuration
 
