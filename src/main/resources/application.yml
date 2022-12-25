@@ -30,7 +30,6 @@ scrape:
         - "Availability"
         - "SuccessE2ELatency"
         - "Egress"
-        - "Ingress"
         - "Transactions"
     - resourceType: "Microsoft.Storage/storageAccounts"
       granularity-in-mins: 60
