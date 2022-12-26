@@ -102,11 +102,11 @@ public class AzureMetricsScraperTest {
     }
 
     @Test
-    public void testScrapeResource_resourceHasMetricsWithMultipleDatapoints_allRetrieved() {
+    public void testScrapeResource_resourceHasMetricsWithMultipleDatapoints_mostRecentRetrieved() {
         when(metricsClient.retrieveResourceMetrics(resourceWithId(resource2.getId()), resourceTypeConfigWithType(resource2.getType()))).thenReturn(metricWithMultipleDatapoints(resource2, "metric4"));
         metricsScraper.scrapeAllResources();
         List<Collector.MetricFamilySamples.Sample> metricSamples = getMetricSamplesFromDefaultRegistry(Set.of("azure_virtualmachines_metric4"));
-        assertEquals(3, metricSamples.stream().filter(sample -> sample.labelValues.contains("vm2")).count());
+        assertEquals(1, metricSamples.stream().filter(sample -> sample.labelValues.contains("vm2")).count());
     }
 
     @Test
@@ -123,7 +123,7 @@ public class AzureMetricsScraperTest {
         when(metricsClient.retrieveResourceMetrics(resourceWithId(resource2.getId()), resourceTypeConfigWithType(resource2.getType()))).thenReturn(mixedMetrics);
         metricsScraper.scrapeAllResources();
         List<Collector.MetricFamilySamples.Sample> metricSamples = getMetricSamplesFromDefaultRegistry(Set.of("azure_virtualmachines_metric6", "azure_virtualmachines_metric7"));
-        assertEquals(6, metricSamples.stream().filter(sample -> sample.labelValues.contains("vm2")).count());
+        assertEquals(2, metricSamples.stream().filter(sample -> sample.labelValues.contains("vm2")).count());
     }
 
     @Test

@@ -49,7 +49,7 @@ public class AzureMetricsScraper {
 
     private void saveMetrics(List<PrometheusMetric> metrics) {
         metrics.forEach(
-            metric -> MetricExporter.forMetric(metric).withRetention(scrapeConfig.getIntervalInMillis()).saveMetric(metric)
+            metric -> MetricExporter.forMetric(metric).saveMetric(metric)
         );
     }
 

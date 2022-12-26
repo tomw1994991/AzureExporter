@@ -5,7 +5,7 @@ import io.prometheus.client.GaugeMetricFamily;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,7 +15,6 @@ public class MetricExporter extends Collector {
 
     private final MetricFamilySamples metricData;
     private final static Map<String, MetricExporter> exporters = new ConcurrentHashMap<>();
-    private long metricDataExpirationMillis = 600000;
 
     @Synchronized
     public static MetricExporter forMetric(PrometheusMetric metric) {
@@ -40,14 +39,9 @@ public class MetricExporter extends Collector {
     }
 
     public void saveMetric(PrometheusMetric metric) {
-        removeExpiredData(metricData.samples);
-        addNewData(metricData.samples, metric);
+        metricData.samples.clear();
+        metricData.samples.addAll(metric.getDataPoints().stream().sorted(Comparator.comparing((MetricFamilySamples.Sample sample) -> sample.timestampMs).reversed()).findFirst().stream().toList());
         log.debug("Saved metric data: {}", metricData.samples);
-    }
-
-    public MetricExporter withRetention(long metricDataExpirationMillis) {
-        this.metricDataExpirationMillis = metricDataExpirationMillis;
-        return this;
     }
 
     private MetricFamilySamples createMetricFamily(PrometheusMetric metric) {
@@ -56,18 +50,5 @@ public class MetricExporter extends Collector {
 
     private List<String> getMetricLabelKeys() {
         return List.of("id");
-    }
-
-    private void removeExpiredData(List<MetricFamilySamples.Sample> existingData) {
-        existingData.removeIf(this::isExpiredData);
-    }
-
-    private void addNewData(List<MetricFamilySamples.Sample> samples, PrometheusMetric metric) {
-        samples.addAll(metric.getDataPoints());
-    }
-
-    private boolean isExpiredData(MetricFamilySamples.Sample data) {
-        Instant expiryDate = Instant.now().minusMillis(metricDataExpirationMillis);
-        return Instant.ofEpochMilli(data.timestampMs).isBefore(expiryDate);
     }
 }

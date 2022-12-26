@@ -42,6 +42,7 @@ public class IntegrationWithPrometheusContainerTests {
         HttpWaitStrategy waitStrategy = new HttpWaitStrategy().forPort(PROMETHEUS_PORT).forStatusCode(200).forPath("/api/v1/label/__name__/values")
                 .forResponsePredicate(response -> prometheusResponseHasMetric(response, "azure_"));
         prometheus.waitingFor(waitStrategy).start();
+        //while(true){} //Allows inspection of local prometheus alongside the exporter e.g. docker ps | grep prom   and localhost:8090/actuator/prometheus
     }
 
     private boolean prometheusResponseHasMetric(String response, String metric) {
