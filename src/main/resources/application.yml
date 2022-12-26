@@ -38,6 +38,36 @@ scrape:
       granularity-in-mins: 60
       metrics:
         - "UsedCapacity"
+    - resourceType: "Microsoft.Storage/storageAccounts/blobServices"
+      granularity-in-mins: 5
+      metrics:
+        - "Availability"
+        - "BlobCapacity"
+        - "BlobCount"
+        - "Egress"
+        - "Ingress"
+        - "SuccessE2ELatency"
+        - "Transactions"
+    - resourceType: "Microsoft.Storage/storageAccounts/fileServices"
+      granularity-in-mins: 5
+      metrics:
+        - "Availability"
+        - "FileCapacity"
+        - "FileCount"
+        - "Egress"
+        - "Ingress"
+        - "SuccessE2ELatency"
+        - "Transactions"
+    - resourceType: "Microsoft.Storage/storageAccounts/queueServices"
+      granularity-in-mins: 5
+      metrics:
+        - "Availability"
+        - "QueueCapacity"
+        - "QueueMessageCount"
+        - "Egress"
+        - "Ingress"
+        - "SuccessE2ELatency"
+        - "Transactions"
     - resourceType: "Microsoft.Compute/VirtualMachines"
       granularity-in-mins: 5
       metrics:
