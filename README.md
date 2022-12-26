@@ -4,18 +4,18 @@
 - As of 2022/10/22, metrics can only be retrieved on a per-resource basis. The application will find all resources
   matching the configuration and return configured metrics.
 - ResourceDiscoverer component finds resources. MetricsScraper component talks to Azure monitor.
-- Actuator prometheus endpoint exposes metrics for prometheus.
+- Actuator prometheus endpoint exposes metrics for prometheus at localhost:8090/actuator/prometheus by default
 - Docs for writing exporters: https://prometheus.io/docs/instrumenting/writing_exporters/
-- Metrics are at localhost:8090/actuator/prometheus by default
 
 ## Configuration
 
-- For YML configuration, resource types are case insensitive. Metric names should be written exactly how Azure uses
+- For YML configuration, resource types are case-insensitive. Metric names should be written exactly how Azure uses
   them.
 - Can use the azure cli to list potential metric definitions https://learn.microsoft.com/en-us/cli/azure/monitor/metrics?view=azure-cli-latest#az-monitor-metrics-list-definitions
-- The exposed metrics for prometheus will be prefixed with 'azure_resourcetype_' and converted into an appropriate
-  format: https://prometheus.io/docs/practices/naming/
-- supports SCCS 
+- The exposed metrics for prometheus will be prefixed with 'azure_<resourcetype>_' and sanitised into an appropriate
+  format: https://prometheus.io/docs/practices/naming/ (lowercase with non-alphanumerics replaced by underscore)
+- Supports SCCS - set JAVA_TOOL_OPTIONS environment variable in the docker container to include -Dspring.cloud.config.uri=...
+- Shorten scrape interval / granularity to sharpen metric resolution at the cost of more azure api calls.
 
 ### Example Metrics
 
