@@ -51,12 +51,12 @@ public class AzureMetricsScraperTest {
     }
 
 
-    private List<PrometheusMetric> emptyMetrics(){
+    private List<PrometheusMetric> emptyMetrics() {
         return new ArrayList<>();
     }
 
     private ScrapeConfigProps setupScrapeConfigProps() {
-        ScrapeConfigProps props =  new ScrapeConfigProps();
+        ScrapeConfigProps props = new ScrapeConfigProps();
         props.setResourceTypeConfigs(defaultResourceTypeConfigs());
         props.setInitialDelayMillis(999999999);
         return props;
@@ -87,7 +87,7 @@ public class AzureMetricsScraperTest {
         return argThat(conf -> conf != null && conf.metrics().size() == numberOfMetrics);
     }
 
-    private ResourceTypeConfig resourceTypeConfigWithType( String resourceType) {
+    private ResourceTypeConfig resourceTypeConfigWithType(String resourceType) {
         return argThat(conf -> conf != null && conf.resourceType() == resourceType);
     }
 
@@ -127,7 +127,7 @@ public class AzureMetricsScraperTest {
     }
 
     @Test
-    public void testScrapeResources_onlyConfiguredMetricsRequested(){
+    public void testScrapeResources_onlyConfiguredMetricsRequested() {
         metricsScraper.scrapeAllResources();
         verify(metricsClient, times(1)).retrieveResourceMetrics(resourceWithId("vm2"), resourceTypeConfigWithMetrics(3));
         verify(metricsClient, times(1)).retrieveResourceMetrics(resourceWithId("vm1"), resourceTypeConfigWithMetrics(3));

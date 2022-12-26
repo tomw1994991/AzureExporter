@@ -18,7 +18,7 @@ public class MetricNamingTest {
             "unusual.characters, non-alphanumeric, azure_unusual_characters_non_alphanumeric"
     })
     public void testCreatePrometheusMetricName_validName(String resourceType, String metricName, String expectedPrometheusName) {
-        assertEquals(expectedPrometheusName, MetricNaming.computePrometheusMetricName( resourceType, metricName));
+        assertEquals(expectedPrometheusName, MetricNaming.computePrometheusMetricName(resourceType, metricName));
     }
 
     @ParameterizedTest

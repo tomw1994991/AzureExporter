@@ -74,7 +74,7 @@ class PrometheusMetricTest {
             "null, 10d,null,null,null",
             "10d,null,null,null,null",
             "10d,2d,3d,4d,5d",
-             "null,11d,14d,15d,10d"}, nullValues = {"null"})
+            "null,11d,14d,15d,10d"}, nullValues = {"null"})
     public void testGetDataPoints_valuePrecedence(Double average, Double min, Double max, Double total, Double count) {
         MetricValue metricValue = new MetricValue(OffsetDateTime.now(), average, min, max, total, count);
         metricResult = MetricResultGenerator.resultFromSingleMetricValue(metricValue);
@@ -82,9 +82,6 @@ class PrometheusMetricTest {
         assertEquals(1, promMetric.getDataPoints().size());
         assertEquals(10d, promMetric.getDataPoints().get(0).value);
     }
-
-
-
 
 
 }

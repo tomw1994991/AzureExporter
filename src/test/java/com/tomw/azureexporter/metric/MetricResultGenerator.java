@@ -14,18 +14,18 @@ public abstract class MetricResultGenerator {
 
     public static AzureResource DEFAULT_RESOURCE = AzureResource.builder().id("resource1").type("virtualMachine").tags(new HashMap<>()).build();
 
-    public static MetricResult resultWithNoData(){
+    public static MetricResult resultWithNoData() {
         return resultFromTimeSeriesList(new ArrayList<>(), "metric1");
     }
 
-    public static MetricResult resultWithDataButNoValue(){
+    public static MetricResult resultWithDataButNoValue() {
         MetricValue metricValue = new MetricValue(OffsetDateTime.now(), null, null, null, null, null);
         return resultFromSingleTimeSeries(timeSeriesWithMetricValue(metricValue), "metric1");
     }
 
-    public static MetricResult resultWithNullTimestamp(){
-      MetricValue metricValue = new MetricValue(null, 10d, 10d, 10d, 10d, 10d);
-      return resultFromSingleTimeSeries(timeSeriesWithMetricValue(metricValue), "metric1");
+    public static MetricResult resultWithNullTimestamp() {
+        MetricValue metricValue = new MetricValue(null, 10d, 10d, 10d, 10d, 10d);
+        return resultFromSingleTimeSeries(timeSeriesWithMetricValue(metricValue), "metric1");
     }
 
     public static MetricResult resultWithSingleDataPointWithValue(String metricName) {
@@ -44,11 +44,11 @@ public abstract class MetricResultGenerator {
         return resultFromTimeSeriesList(List.of(timeSeriesWithMetricValue(metricValue1), timeSeriesWithMetricValue(metricValue2), timeSeriesWithMetricValue(metricValue3)), metricName);
     }
 
-    public static MetricResult resultFromSingleMetricValue(MetricValue value){
+    public static MetricResult resultFromSingleMetricValue(MetricValue value) {
         return resultFromSingleTimeSeries(timeSeriesWithMetricValue(value), "metric1");
     }
 
-    private static MetricResult resultFromSingleTimeSeries(TimeSeriesElement timeSeries, String metricName){
+    private static MetricResult resultFromSingleTimeSeries(TimeSeriesElement timeSeries, String metricName) {
         return resultFromTimeSeriesList(List.of(timeSeries), metricName);
     }
 
