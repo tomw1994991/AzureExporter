@@ -54,7 +54,7 @@ public class PrometheusMetric {
     private Collector.MetricFamilySamples.Sample convertMetricValueToPrometheus(MetricValue metricValue) {
         Double value = getValueFromAzMetricValues(metricValue);
         return new Collector.MetricFamilySamples.Sample(getName(),
-                List.of("id"), List.of(MetricNaming.substringAfterSlash(resourceId)),
+                List.of("id"), List.of(MetricNaming.substringAfterSlash(MetricNaming.removeUndifferentiatedSuffix(resourceId))),
                 value, metricValue.getTimeStamp().toInstant().toEpochMilli());
     }
 

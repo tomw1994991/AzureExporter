@@ -35,6 +35,18 @@ public class MetricNamingTest {
     }
 
     @ParameterizedTest
+    @CsvSource({
+            "Microsoft.Storage/storageAccounts/123, Microsoft.Storage/storageAccounts/123",
+            "a, a",
+            "/subscriptions/abc/resourceGroups/td/providers/Microsoft.Storage/storageAccounts/storAcc/blobServices/default, /subscriptions/abc/resourceGroups/td/providers/Microsoft.Storage/storageAccounts/storAcc",
+            "a/, a/",
+            "virtualMachines, virtualMachines",
+    })
+    public void testRemoveUndifferentiatedSuffix_variousValues(String input, String expectedOutput) {
+        assertEquals(expectedOutput, MetricNaming.removeUndifferentiatedSuffix(input));
+    }
+
+    @ParameterizedTest
     @NullAndEmptySource
     public void testSubstringAfterSlash_nullAndEmptyReturned(String input) {
         assertEquals("", MetricNaming.substringAfterSlash(input));
