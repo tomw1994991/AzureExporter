@@ -138,6 +138,14 @@ scrape:
       granularity-in-mins: 60
       metrics:
         - "StorageUsed"
+    - resourceType: "Microsoft.KeyVault/vaults"
+      granularity-in-mins: 5
+      metrics:
+        - "Availability"
+        - "SaturationShoebox"
+        - "ServiceApiHit"
+        - "ServiceApiLatency"
+        - "ServiceApiResult"
     - resourceType: "Microsoft.DBforMySQL/flexibleServers"
       granularity-in-mins: 5
       metrics:

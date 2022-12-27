@@ -77,7 +77,7 @@ public class ResourceDiscovererTest {
         resourceDiscoverer.discoverResources();
         assertEquals(1, resourceDiscoverer.getResourcesForType("storage").size());
 
-        setupQueryResponseFromResourceMaps(new ArrayList<Map<String, Object>>());
+        setupQueryResponseFromResourceMaps(new ArrayList<>());
         resourceDiscoverer.discoverResources();
         assertEquals(0, resourceDiscoverer.getResourcesForType("storage").size());
     }
