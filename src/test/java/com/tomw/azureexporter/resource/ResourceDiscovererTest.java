@@ -49,6 +49,15 @@ public class ResourceDiscovererTest {
     }
 
     @Test
+    public void testDiscoverResources_storageAccountSubResourcesAdded() {
+        Map<String, Object> resource = setupResourceMap("id1", "Microsoft.Storage/storageAccounts", new HashMap<>());
+        setupQueryResponseFromResourceMaps(List.of(resource));
+        resourceDiscoverer.discoverResources();
+        assertEquals(1, resourceDiscoverer.getResourcesForType("microsoft.storage/storageaccounts/blobservices").size());
+        assertEquals(4, resourceDiscoverer.getDiscoveredResourceTypes().size());
+    }
+
+    @Test
     public void testGetResourcesForType_multipleResources_returned_caseIgnored() {
 
         Map<String, Object> resource = setupResourceMap("id1", "storage", new HashMap<>());
@@ -127,7 +136,6 @@ public class ResourceDiscovererTest {
         Map<String, Object> resource = setupResourceMap("id1", "storage", new HashMap<>());
         setupQueryResponseFromResourceMaps(List.of(resource));
     }
-
 
     private Map<String, Object> setupResourceMap(String id, String type, Map<String, String> tags) {
         Map<String, Object> resource = new HashMap<>();

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -33,25 +34,41 @@ public class ResourceDiscoverer {
 
     @Scheduled(initialDelayString = "${resource-discovery.initial-delay-millis:1000}", fixedDelayString = "${resource-discovery.interval-in-millis:300000}")
     protected void discoverResources() {
-        QueryRequest query = new QueryRequest().withQuery("Resources").withOptions(new QueryRequestOptions().withResultFormat(ResultFormat.OBJECT_ARRAY));
-        QueryResponse response = resourceManager.resourceProviders().resources(query);
-        saveResources(response);
+        QueryResponse response = queryResourceGraphAPI();
+        Map<String, Set<AzureResource>> foundResources = getResourcesFromResourceGraphResponse(response);
+        this.resources = addStorageAccountSubResources(foundResources);
         log.info("Refreshed Azure resource information. Found resources for types: {}", getDiscoveredResourceTypes());
         log.debug("Full resource collection: {}", resources);
     }
 
-    private void saveResources(QueryResponse response) {
+    private QueryResponse queryResourceGraphAPI() {
+        QueryRequest query = new QueryRequest().withQuery("Resources").withOptions(new QueryRequestOptions().withResultFormat(ResultFormat.OBJECT_ARRAY));
+        QueryResponse response = resourceManager.resourceProviders().resources(query);
+        return response;
+    }
+
+    private Map<String, Set<AzureResource>> getResourcesFromResourceGraphResponse(QueryResponse response) {
         Map<String, Set<AzureResource>> refreshedResources = new ConcurrentHashMap<>();
-        ((List<Map<String, Object>>) response.data()).forEach(responseMap -> {
-            AzureResource resource = convertMapToResource(responseMap);
-            saveResource(resource, refreshedResources);
-        });
-        this.resources = refreshedResources;
+        ((List<Map<String, Object>>) response.data()).stream().map(this::convertMapToResource).forEach(resource -> saveResource(resource, refreshedResources));
+        return refreshedResources;
     }
 
     /*package*/ AzureResource convertMapToResource(final Map<String, Object> responseMap) {
         Map<String, String> tags = (Map<String, String>) responseMap.getOrDefault("tags", new HashMap<>());
-        return new AzureResource((String) responseMap.get("id"), (String) responseMap.get("type"), null != tags ? tags : new HashMap<>());
+        return new AzureResource((String) responseMap.get("id"), (String) responseMap.get("type"), null != tags ? tags : Collections.emptyMap());
+    }
+
+    private Map<String, Set<AzureResource>> addStorageAccountSubResources(Map<String, Set<AzureResource>> foundResources) {
+        Set<AzureResource> storageAccounts = foundResources.getOrDefault("microsoft.storage/storageaccounts", new HashSet<>());
+        Map<String, Set<AzureResource>> updatedResources = new HashMap<>(foundResources);
+        updatedResources.put("microsoft.storage/storageaccounts/blobservices", getStorageAccountServiceResources(storageAccounts, "blobservices"));
+        updatedResources.put("microsoft.storage/storageaccounts/fileservices", getStorageAccountServiceResources(storageAccounts, "fileservices"));
+        updatedResources.put("microsoft.storage/storageaccounts/queueservices", getStorageAccountServiceResources(storageAccounts, "queueservices"));
+        return updatedResources;
+    }
+
+    private Set<AzureResource> getStorageAccountServiceResources(Set<AzureResource> storageAccounts, String service){
+        return storageAccounts.stream().map(storageAccount -> new AzureResource(storageAccount.getId() + "/" + service + "/default", "microsoft.storage/storageaccounts/" + service, Collections.emptyMap())).collect(Collectors.toSet());
     }
 
     private void saveResource(AzureResource resource, Map<String, Set<AzureResource>> resourceMap) {
