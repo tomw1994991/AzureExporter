@@ -22,12 +22,12 @@ resource-discovery:
   initial-delay-millis: 500
 
 scrape:
-  interval-in-millis: 300000
-  query-window-in-millis: 600000
+  interval-in-millis: 60000
+  query-window-in-millis: 360000
   initial-delay-millis: 5000
   resourceTypeConfigs:
     - resourceType: "Microsoft.Storage/storageAccounts"
-      granularity-in-mins: 5
+      granularity-in-mins: 1
       metrics:
         - "Ingress"
         - "Availability"
@@ -54,7 +54,7 @@ scrape:
         - "QueueMessageCount"
         - "QueueCapacity"
     - resourceType: "Microsoft.Storage/storageAccounts/blobServices"
-      granularity-in-mins: 5
+      granularity-in-mins: 1
       metrics:
         - "Availability"
         - "Egress"
@@ -62,7 +62,7 @@ scrape:
         - "SuccessE2ELatency"
         - "Transactions"
     - resourceType: "Microsoft.Storage/storageAccounts/fileServices"
-      granularity-in-mins: 5
+      granularity-in-mins: 1
       metrics:
         - "Availability"
         - "Egress"
@@ -70,7 +70,7 @@ scrape:
         - "SuccessE2ELatency"
         - "Transactions"
     - resourceType: "Microsoft.Storage/storageAccounts/queueServices"
-      granularity-in-mins: 5
+      granularity-in-mins: 1
       metrics:
         - "Availability"
         - "Egress"
@@ -78,7 +78,7 @@ scrape:
         - "SuccessE2ELatency"
         - "Transactions"
     - resourceType: "Microsoft.Compute/VirtualMachines"
-      granularity-in-mins: 5
+      granularity-in-mins: 1
       metrics:
         - "Percentage CPU"
         - "VmAvailabilityMetric"
@@ -103,7 +103,7 @@ scrape:
         - "IfUnderDDoSAttack"
         - "PingMeshAverageRoundtripMs"
     - resourceType: "Microsoft.Network/applicationGateways"
-      granularity-in-mins: 5
+      granularity-in-mins: 1
       metrics:
         - "AzwafTotalRequests"
         - "BackendLastByteResponseTime"
@@ -122,7 +122,7 @@ scrape:
         - "UnhealthyHostCount"
         - "Throughput"
     - resourceType: "Microsoft.Compute/disks"
-      granularity-in-mins: 5
+      granularity-in-mins: 1
       metrics:
         - "Composite Disk Write Bytes/sec"
         - "Composite Disk Read Bytes/sec"
@@ -139,7 +139,7 @@ scrape:
       metrics:
         - "StorageUsed"
     - resourceType: "Microsoft.KeyVault/vaults"
-      granularity-in-mins: 5
+      granularity-in-mins: 1
       metrics:
         - "Availability"
         - "SaturationShoebox"
@@ -147,7 +147,7 @@ scrape:
         - "ServiceApiLatency"
         - "ServiceApiResult"
     - resourceType: "Microsoft.DBforMySQL/flexibleServers"
-      granularity-in-mins: 5
+      granularity-in-mins: 1
       metrics:
         - "HA_SQL_status"
         - "HA_IO_status"

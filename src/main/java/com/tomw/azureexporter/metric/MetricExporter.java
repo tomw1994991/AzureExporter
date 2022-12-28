@@ -40,14 +40,15 @@ public class MetricExporter extends Collector {
         log.debug("Collected metric values for export: {}", metricData);
         return metricData.values().stream().toList();
     }
-
+    
     public void saveMetric(PrometheusMetric metric) {
-        if(!CollectionUtils.isEmpty(metric.getDataPoints())){
-            MetricFamilySamples newSamples = createMetricFamily(metric);
+        
+        MetricFamilySamples newSamples = createMetricFamily(metric);
+        if (!CollectionUtils.isEmpty(metric.getDataPoints())) {
             newSamples.samples.add(metric.getDataPoints().get(metric.getDataPoints().size() - 1));
-            metricData.put(metric.getSanitisedResourceId(), newSamples);
-            log.debug("Saved metric data: {} : {}", metric.getSanitisedResourceId(), metricData.get(metric.getSanitisedResourceId()));
         }
+        metricData.put(metric.getSanitisedResourceId(), newSamples);
+        log.debug("Saved metric data: {} : {}", metric.getSanitisedResourceId(), metricData.get(metric.getSanitisedResourceId()));
     }
 
     private MetricFamilySamples createMetricFamily(PrometheusMetric metric) {
