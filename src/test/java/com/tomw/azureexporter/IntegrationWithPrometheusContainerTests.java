@@ -3,7 +3,6 @@ package com.tomw.azureexporter;
 import io.prometheus.client.CollectorRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +23,10 @@ public class IntegrationWithPrometheusContainerTests {
 
     private static final int PROMETHEUS_PORT = 9090;
 
+    static {
+      System.setProperty("java.net.useSystemProxies", "true");
+    }
+
     @BeforeAll
     public static void beforeAll() {
         CollectorRegistry.defaultRegistry.clear();
@@ -37,7 +40,6 @@ public class IntegrationWithPrometheusContainerTests {
             .withLogConsumer(new Slf4jLogConsumer(log));
 
     @Test
-    @Disabled("Requires local azure login and docker daemon")
     public void testPrometheusIntegration_canScrapeAzureMetrics() {
         HttpWaitStrategy waitStrategy = new HttpWaitStrategy().forPort(PROMETHEUS_PORT).forStatusCode(200).forPath("/api/v1/label/__name__/values")
                 .forResponsePredicate(response -> prometheusResponseHasMetric(response, "azure_"));
