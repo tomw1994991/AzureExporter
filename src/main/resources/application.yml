@@ -97,6 +97,10 @@ scrape:
         - "Disk Read Bytes"
         - "Network Out"
         - "Network In"
+        - "OS Disk Queue Depth"
+        - "Data Disk Queue Depth"
+        - "OS Disk Read Operations/Sec"
+        - "Data Disk Read Operations/Sec"
     - resourceType: "Microsoft.Network/virtualNetworks"
       granularity-in-mins: 5
       metrics:
@@ -126,6 +130,8 @@ scrape:
       metrics:
         - "Composite Disk Write Bytes/sec"
         - "Composite Disk Read Bytes/sec"
+        - "Composite Disk Write Operations/sec"
+        - "Composite Disk Read Operations/sec"
         - "DiskPaidBurstIOPS"
     - resourceType: "Microsoft.ContainerRegistry/registries"
       granularity-in-mins: 5
