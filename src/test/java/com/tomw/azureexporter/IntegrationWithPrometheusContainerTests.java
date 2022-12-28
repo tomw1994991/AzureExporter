@@ -37,7 +37,7 @@ public class IntegrationWithPrometheusContainerTests {
 
     @Container
     public static GenericContainer prometheus = new GenericContainer(DockerImageName.parse("prom/prometheus")).withExposedPorts(PROMETHEUS_PORT)
-            .withCopyFileToContainer(MountableFile.forClasspathResource("prometheus.yml"), "/etc/prometheus/prometheus.yml")
+            .withCopyFileToContainer(MountableFile.forClasspathResource("prometheus.yml", 0777), "/etc/prometheus/prometheus.yml")
             .withAccessToHost(true)
             .withLogConsumer(new Slf4jLogConsumer(log));
 
