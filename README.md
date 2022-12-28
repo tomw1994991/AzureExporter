@@ -16,6 +16,7 @@
   format: https://prometheus.io/docs/practices/naming/ (lowercase with non-alphanumerics replaced by underscore)
 - Supports SCCS - set JAVA_TOOL_OPTIONS environment variable in the docker container to include -Dspring.cloud.config.uri=...
 - Shorten scrape interval / granularity to sharpen metric resolution at the cost of more azure api calls.
+- If running behind a proxy, it is recommended to set -Djava.net.useSystemProxies=true in JVM arguments as per https://learn.microsoft.com/en-us/azure/developer/java/sdk/proxying
 
 ### Example Metrics
 
