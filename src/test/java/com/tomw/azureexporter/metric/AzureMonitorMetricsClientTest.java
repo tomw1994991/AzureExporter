@@ -85,10 +85,10 @@ public class AzureMonitorMetricsClientTest {
     }
 
     @Test
-    public void testQueryResourceMetrics_hasResultsButNoData_noPrometheusMetrics() {
+    public void testQueryResourceMetrics_hasResultsButNoData_emptyDataPulled() {
         when(mockQueryClient.queryResourceWithResponse(any(), any(), any(), any())).thenReturn(responseWithMetricsButNoData());
         List<PrometheusMetric> metrics = metricsClient.retrieveResourceMetrics(resource, config);
-        assertEquals(0, metrics.size());
+        assertEquals(1, metrics.size());
     }
 
     @Test
