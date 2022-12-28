@@ -3,6 +3,7 @@ package com.tomw.azureexporter;
 import io.prometheus.client.CollectorRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +20,7 @@ import org.testcontainers.utility.MountableFile;
 @AutoConfigureObservability
 @DirtiesContext
 @Slf4j
+@Disabled("Requires local azure login and docker daemon")
 public class IntegrationWithPrometheusContainerTests {
 
     private static final int PROMETHEUS_PORT = 9090;
