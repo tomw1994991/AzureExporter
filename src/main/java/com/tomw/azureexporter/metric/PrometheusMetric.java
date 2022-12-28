@@ -22,6 +22,8 @@ public class PrometheusMetric {
     private final String resourceType;
     private final String resourceId;
     @Getter
+    private final String sanitisedResourceId;
+    @Getter
     private final String name;
     @Getter
     private final String description;
@@ -32,6 +34,7 @@ public class PrometheusMetric {
     public PrometheusMetric(@NotNull AzureResource resource, @NotNull MetricResult azureMetric){
         this.resourceType = MetricNaming.substringAfterSlash(resource.getType());
         this.resourceId = resource.getId();
+        this.sanitisedResourceId = MetricNaming.substringAfterSlash(MetricNaming.removeUndifferentiatedSuffix(resourceId));
         this.description = azureMetric.getDescription();
         this.name = MetricNaming.computePrometheusMetricName(resourceType, azureMetric.getMetricName());
         azureMetric.getTimeSeries().forEach(time -> {
@@ -54,7 +57,7 @@ public class PrometheusMetric {
     private Collector.MetricFamilySamples.Sample convertMetricValueToPrometheus(MetricValue metricValue) {
         Double value = getValueFromAzMetricValues(metricValue);
         return new Collector.MetricFamilySamples.Sample(getName(),
-                List.of("id"), List.of(MetricNaming.substringAfterSlash(MetricNaming.removeUndifferentiatedSuffix(resourceId))),
+                List.of("id"), List.of(sanitisedResourceId),
                 value, metricValue.getTimeStamp().toInstant().toEpochMilli());
     }
 

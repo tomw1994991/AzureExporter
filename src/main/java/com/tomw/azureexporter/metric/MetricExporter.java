@@ -10,10 +10,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.util.CollectionUtils;
+
 @Slf4j
 public class MetricExporter extends Collector {
 
-    private final MetricFamilySamples metricData;
+    private final Map<String, MetricFamilySamples> metricData;
     private final static Map<String, MetricExporter> exporters = new ConcurrentHashMap<>();
 
     @Synchronized
@@ -27,7 +29,8 @@ public class MetricExporter extends Collector {
     }
 
     private MetricExporter(PrometheusMetric metric) {
-        metricData = createMetricFamily(metric);
+        metricData = new ConcurrentHashMap<>();
+        metricData.put("default", createMetricFamily(metric));
         this.register();
         log.info("Created new exporter for metric {}", metric.getName());
     }
@@ -35,13 +38,16 @@ public class MetricExporter extends Collector {
     @Override
     public List<MetricFamilySamples> collect() {
         log.debug("Collected metric values for export: {}", metricData);
-        return List.of(metricData);
+        return metricData.values().stream().toList();
     }
 
     public void saveMetric(PrometheusMetric metric) {
-        metricData.samples.clear();
-        metricData.samples.addAll(metric.getDataPoints().stream().sorted(Comparator.comparing((MetricFamilySamples.Sample sample) -> sample.timestampMs).reversed()).findFirst().stream().toList());
-        log.debug("Saved metric data: {}", metricData.samples);
+        if(!CollectionUtils.isEmpty(metric.getDataPoints())){
+            MetricFamilySamples newSamples = createMetricFamily(metric);
+            newSamples.samples.add(metric.getDataPoints().get(metric.getDataPoints().size() - 1));
+            metricData.put(metric.getSanitisedResourceId(), newSamples);
+            log.debug("Saved metric data: {} : {}", metric.getSanitisedResourceId(), metricData.get(metric.getSanitisedResourceId()));
+        }
     }
 
     private MetricFamilySamples createMetricFamily(PrometheusMetric metric) {

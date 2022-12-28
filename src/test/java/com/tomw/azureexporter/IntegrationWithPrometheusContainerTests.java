@@ -1,5 +1,7 @@
 package com.tomw.azureexporter;
 
+import java.time.Duration;
+
 import io.prometheus.client.CollectorRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
@@ -45,7 +47,7 @@ public class IntegrationWithPrometheusContainerTests {
     public void testPrometheusIntegration_canScrapeAzureMetrics() {
         HttpWaitStrategy waitStrategy = new HttpWaitStrategy().forPort(PROMETHEUS_PORT).forStatusCode(200).forPath("/api/v1/label/__name__/values")
                 .forResponsePredicate(response -> prometheusResponseHasMetric(response, "azure_"));
-        prometheus.waitingFor(waitStrategy).start();
+        prometheus.waitingFor(waitStrategy.withStartupTimeout(Duration.ofMinutes(5))).start();
         //while(true){} //Allows inspection of local prometheus alongside the exporter e.g. docker ps | grep prom   and localhost:8090/actuator/prometheus
     }
 
