@@ -60,7 +60,7 @@ public class ResourceDiscoverer {
 
     private Map<String, Set<AzureResource>> addStorageAccountSubResources(Map<String, Set<AzureResource>> foundResources) {
         Set<AzureResource> storageAccounts = foundResources.getOrDefault("microsoft.storage/storageaccounts", new HashSet<>());
-        Map<String, Set<AzureResource>> updatedResources = new HashMap<>(foundResources);
+        Map<String, Set<AzureResource>> updatedResources = new ConcurrentHashMap<>(foundResources);
         updatedResources.put("microsoft.storage/storageaccounts/blobservices", getStorageAccountServiceResources(storageAccounts, "blobservices"));
         updatedResources.put("microsoft.storage/storageaccounts/fileservices", getStorageAccountServiceResources(storageAccounts, "fileservices"));
         updatedResources.put("microsoft.storage/storageaccounts/queueservices", getStorageAccountServiceResources(storageAccounts, "queueservices"));
